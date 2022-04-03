@@ -35,7 +35,12 @@ void pixel_buffer_init(int *pixel_ctrl_ptr){
 /*
     GAME STATES
 */
-
+void freeplay(){
+    collide_id = check_collision();
+    erase();
+    // update();
+    draw();
+}
 
 /*
     KINEMATICS FUNCTIONS
