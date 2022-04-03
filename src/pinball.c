@@ -4,7 +4,9 @@
 #include <math.h>
 #include "globals.h"
 #include "address_map_arm.h"
-#include "freeplay_template.h"
+#include "resources/freeplay_template.h"
+#include "resources/start_template.h"
+#include "resources/end_template.h"
 
 
 
@@ -62,6 +64,14 @@ void erase_ball(int x, int y){
         if(j==-3 || j == 3) limit =5;
         for(int i = -limit; i <= limit; i++){
             plot_pixel(x+i, y+j, freeplay[j+6][i+6]);
+        }
+    }
+}
+
+void draw_start_template( ){
+    for(int i = 0; i < 320; i++){
+        for(int j = 0; j < 240; j++){
+            plot_pixel(i, j, start[j][i]);
         }
     }
 }
