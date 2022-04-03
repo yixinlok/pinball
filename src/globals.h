@@ -57,9 +57,9 @@ double ball_velocity[2];
 int ball_location[2]; 
 int time;
 
-#define LAUNCH_X 170
+// #define LAUNCH_X 170
+#define LAUNCH_X 193
 #define LAUNCH_Y 30
-
 
 
 /*
@@ -101,7 +101,8 @@ const int vertical_walls[NUM_VERTICAL_WALLS][3] = {{127, 137, 197}, {259, 137, 1
 #define FLIPPER_R_Y 219
 
 #define DEFAULT_FLIPPER_ANGLE 0.5350 //in radians, equal to 30 degrees
-const int flipper_angles[] = {};
+// {x0,y0}, {x1,y1} [left(0)/right(1)][start point (0)/ end point (1)][x(0)/y(1)]
+const int flipper_location[2][2][2] = {};
 
 
 #define BUMPER_DIAMETER 26

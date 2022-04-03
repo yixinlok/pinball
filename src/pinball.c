@@ -19,6 +19,10 @@ int main(void){
     return 1;
 }
 
+/*
+    HARDWARE STUFF
+*/
+
 void pixel_buffer_init(int *pixel_ctrl_ptr){
     *(pixel_ctrl_ptr + 1) = FPGA_ONCHIP_BASE; 
     wait_for_vsync();
@@ -29,7 +33,12 @@ void pixel_buffer_init(int *pixel_ctrl_ptr){
 }
 
 /*
-    PHYSICS FUNCTIONS
+    GAME STATES
+*/
+
+
+/*
+    KINEMATICS FUNCTIONS
 */
 
 /* 
@@ -91,11 +100,20 @@ void draw_flippers(int angle){
 
     x1 = FLIPPER_R_X - FLIPPER_LENGTH * cos(angle);
     y1 = FLIPPER_R_Y + FLIPPER_LENGTH * sin(angle);
-    draw_thick_line(FLIPPER_R_X, FLIPPER_R_Y, x1, y1);
+    draw_thick_line(FLIPPER_R_X, FLIPPER_R_Y, x1, y1, WHITE);
 }
 
-void draw_thick_line(int x0, int y0, int x1, int y1){
+void erase_flippers(int angle){
+    int x1 = FLIPPER_L_X + FLIPPER_LENGTH * cos(angle);
+    int y1 = FLIPPER_L_Y + FLIPPER_LENGTH * sin(angle);
+    draw_thick_line(FLIPPER_L_X, FLIPPER_L_Y, x1, y1);
 
+    x1 = FLIPPER_R_X - FLIPPER_LENGTH * cos(angle);
+    y1 = FLIPPER_R_Y + FLIPPER_LENGTH * sin(angle);
+    draw_thick_line(FLIPPER_R_X, FLIPPER_R_Y, x1, y1, BLACK);
+}
+
+void draw_thick_line(int x0, int y0, int x1, int y1, short int colour){
     bool is_steep = abs(y1-y0) > abs(x1-x0);
     int temp;
     if(is_steep){
@@ -117,10 +135,10 @@ void draw_thick_line(int x0, int y0, int x1, int y1){
 
     for(int x = x0; x <= x1; x++){
         if(is_steep){
-			plot_pixel(y,x,WHITE);
+			plot_pixel(y,x,colour);
 		}
         else {
-			plot_pixel(x,y,WHITE);
+			plot_pixel(x,y,colour);
 		}
         error += dy;
         if(error > 0){
@@ -149,7 +167,7 @@ void swap(int* p1, int* p2){
 }
 
 /*
-    COLLISION FUNCTIONS
+    COLLISION CHECKING FUNCTIONS
 */
 int check_collision(int ball_x, int ball_y){
     int collide_id = 0;
