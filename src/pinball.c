@@ -4,6 +4,8 @@
 #include <math.h>
 #include "globals.h"
 #include "address_map_arm.h"
+#include "freeplay_template.h"
+
 
 
 int main(void){
@@ -38,20 +40,16 @@ void plot_pixel(int x, int y, short int line_color)
 }
 
 void draw_ball(int x, int y){
-    // MEDIUM BEIGE
-    for(int i = -6 ; i <= 6 ; i++){
+    for(int j = -6; j <= 6; i++){
         int limit = 6;
-        if( i == -6 || i == 6) limit = 2;
-        if( i == -5 || i == 5) limit = 3;
-        if( i == -4 || i == 4) limit = 4;
-        if( i == -3 || i == 3) limit = 5;
-        for(int j = -limit ; j <= limit ; i++){
-            plot_pixel(x+i,y+j,MEDIUM_BEIGE);
+        if(j==-6 || j == 6) limit =2;
+        if(j==-5 || j == 5) limit =3;
+        if(j==-4 || j == 4) limit =4;
+        if(j==-3 || j == 3) limit =5;
+        for(int i = -limit; i <= limit; j++){
+            plot_pixel(x+i, y+j, ball_colours[j+6][i+6]);
         }
     }
-    // LIGHT BEIGE
-
-    // DARK BEIGE
 }
 
 void draw_freeplay_template( ){

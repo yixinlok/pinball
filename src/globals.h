@@ -60,12 +60,6 @@ int time;
 #define LAUNCH_X 170
 #define LAUNCH_Y 30
 
-/*
-    GRAPHICS TEMPLATES
-*/
-int start_screen[RESOLUTION_X][RESOLUTION_Y]; // 2d vector with pixel colours for each coordinate
-int freeplay_screen[RESOLUTION_X][RESOLUTION_Y]; //(constant) // 2d vector with pixel colours for each coordinate. template only, no flipper or balls, only bumpers and walls
-int end_screen[RESOLUTION_X][RESOLUTION_Y]; // 2d vector with pixel colours for each coordinate
 
 
 /*
@@ -110,14 +104,15 @@ const int vertical_walls[NUM_VERTICAL_WALLS][3] = {{127, 137, 197}, {259, 137, 1
 const int flipper_angles[] = {};
 
 
-#define BUMPER_RADIUS 13
+#define BUMPER_DIAMETER 26
 // const int bumper_1[][]; //(constant) (2d vector with boundary locations, normal angles, scores as rows. columns correspond to each point on the bumper )
 // const int bumper_2[][]; //(constant) (2d vector with boundary locations, normal angles, scores)
 // const int bumper_3[][]; //(constant) (2d vector with boundary locations, normal angles, scores)
 // const int bumper_4[][]; //(constant) (2d vector with boundary locations, normal angles, scores)
 // const int bumper_5[][]; //(constant) (2d vector with boundary locations, normal angles, scores)
 
-
+#define BALL_DIAMETER 13
+const uint16_t ball_colours[13][13] = { {65535,65535,65535,65535,50577,50577,50577,50577,50577,65535,65535,65535,65535}, {65535,65535,65535,50577,50577,50577,50577,50577,50577,50577,65535,65535,65535}, {65535,65535,50577,50577,65336,65336,65336,65336,50577,50577,50577,65535,65535}, {65535,50577,50577,65336,65535,65535,65336,50577,50577,50577,50577,35821,65535}, {50577,50577,65336,65535,65535,65336,50577,50577,50577,50577,50577,50577,35821}, {50577,50577,65336,65535,65336,50577,50577,50577,50577,50577,50577,50577,35821}, {50577,50577,65336,65336,50577,50577,50577,50577,50577,50577,50577,35821,35821}, {50577,50577,65336,50577,50577,50577,50577,50577,50577,50577,50577,35821,35821}, {50577,50577,50577,50577,50577,50577,50577,50577,50577,50577,50577,35821,35821}, {65535,50577,50577,50577,50577,50577,50577,50577,50577,50577,35821,35821,65535}, {65535,65535,50577,50577,50577,50577,50577,50577,50577,35821,35821,65535,65535}, {65535,65535,65535,35821,50577,50577,35821,35821,35821,35821,65535,65535,65535}, {65535,65535,65535,65535,35821,35821,35821,35821,35821,65535,65535,65535,65535}, };
 
 // int prev_ball_location[][]; //(2d vector) - for buffers
 // int prev_flipper_location[][]; //(2d vector)  - for buffers
