@@ -89,8 +89,9 @@ const int vertical_walls[NUM_VERTICAL_WALLS][3] = {{127, 137, 197}, {259, 137, 1
 #define NUM_FLIPPER_ANGLES 14
 int flipper_angle_counter = 0
 int flipper_angles[NUM_FLIPPER_ANGLES] = {0.48, 0.42, 0.35, 0.28, 0.2, 0.11, 0.01, 0.01, 0.11, 0.2, 0.28, 0.35, 0.42, 0.48};
-int flipper_end_location[2][2] = {0, 0};
-int prev_flipper_end_location[2][2] = {0, 0}; 
+//[L/R][x/y]
+int flipper_end_location[2][2] = {{0, 0},{0, 0}};
+int prev_flipper_end_location[2][2] = {{0, 0},{0, 0}};
 
 
 #define BUMPER_DIAMETER 26

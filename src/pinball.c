@@ -66,8 +66,18 @@ void update_flipper_end_location(double angle){
 }
 
 /* 
-    DRAWING FUNCTIONS
+    DRAW AND ERASE FUNCTIONS
 */
+void erase(){
+    erase_flippers();
+    erase_ball(prev_ball_location[0], prev_ball_location[1]);
+}
+
+void draw(){
+    draw_flippers();
+    draw_ball(ball_location[0], ball_location[1]);
+    //draw_score();
+}
 
 void plot_pixel(int x, int y, short int line_color)
 {
@@ -117,7 +127,7 @@ void draw_freeplay_template( ){
     }
 }
 
-void draw_flippers(int angle){
+void draw_flippers(){
     int xleft = flipper_end_location[0][0];
     int yleft = flipper_end_location[0][1];
     int xright = flipper_end_location[1][0];
@@ -127,11 +137,11 @@ void draw_flippers(int angle){
     draw_thick_line(FLIPPER_R_X, FLIPPER_R_Y, xright, yright, WHITE);
 }
 
-void erase_flippers(int angle){
-    int xleft = flipper_end_location[0][0];
-    int yleft = flipper_end_location[0][1];
-    int xright = flipper_end_location[1][0];
-    int yright = flipper_end_location[1][1];
+void erase_flippers(){
+    int xleft = prev_flipper_end_location[0][0];
+    int yleft = prev_flipper_end_location[0][1];
+    int xright = prev_flipper_end_location[1][0];
+    int yright = prev_flipper_end_location[1][1];
 
     draw_thick_line(FLIPPER_L_X, FLIPPER_L_Y, xleft, yleft, BLACK);
     draw_thick_line(FLIPPER_R_X, FLIPPER_R_Y, xright, yright, BLACK);
@@ -197,8 +207,6 @@ int check_collision(int ball_x, int ball_y){
     int collide_id = 0;
     //check in the following order for optimal speed:
     
-    if(collide_id!=0) return collide_id;
-
     //check straight walls
     if(ball_y<= roof) return WALL_COLLIDE;
     for(int i = 0; i<NUM_VERTICAL_WALLS; i++){
@@ -208,12 +216,14 @@ int check_collision(int ball_x, int ball_y){
     }
 
     //check flippers
-    
+    if(check_flipper_collide(0, ball_x,ball_y)) return FLIPPER_COLLIDE; //left
+    if(check_flipper_collide(1, ball_x,ball_y)) return FLIPPER_COLLIDE; //right
 
     //check slanted walls
     for(int i = 0; i<NUM_SLANTED_WALLS; i++){
         if(check_slanted_wall_collide(i,ball_x,ball_y)) return WALL_COLLIDE;
     }
+
     //check bumpers
 
     return collide_id;
@@ -247,12 +257,60 @@ bool check_slanted_wall_collide(int wall_id, int ball_x, int ball_y){
 
     for(int x = x0; x <= x1; x++){
         if(is_steep){
-            if(ball_x ==y && ball_y ==x) printf("works\n");
-			return true;
+            if(ball_x == y && ball_y == x) return true;
 		}
         else {
-            if(ball_x ==x && ball_y ==y) printf("works\n");
-			return true;
+            if(ball_x == x && ball_y == y) return true;
+		}
+        error += dy;
+        if(error > 0){
+            y += y_step;
+            error -= dx;
+        }
+    }
+    return false;
+}
+
+bool check_flipper_collide(int LR, int ball_x, int ball_y){
+    if(LR==0){
+        int x0 = FLIPPER_L_X;
+        int y0 = FLIPPER_L_Y;
+        int x1 = flipper_end_location[0][0];
+        int y1 = flipper_end_location[0][1];
+    }
+    else{
+        int x0 = FLIPPER_R_X;
+        int y0 = FLIPPER_R_Y;
+        int x1 = slanted_walls[wall_id][1][0];
+        int y1 = slanted_walls[wall_id][1][1];
+    }
+
+    bool is_steep = abs(y1-y0) > abs(x1-x0);
+    int temp;
+    if(is_steep){
+        swap(&x0, &y0);
+        swap(&x1, &y1);
+    }
+    if(x0 > x1){
+        swap(&x0, &x1);
+        swap(&y0, &y1);
+    }
+
+    int dx = x1 - x0;
+    int dy = abs(y1 - y0);
+    int error = -(dx/2);
+    int y = y0;
+    int y_step;
+    if(y0 < y1) y_step = 1;
+    else y_step = -1;
+
+    for(int x = x0; x <= x1; x++){
+        if(is_steep){
+            //if distance between point on the flipper is smaller than flipper radius + ball radius
+            if(sqrt((ball_x - y)^2 + (ball_y - x)^2) <  10) return true;
+		}
+        else {
+            if(sqrt((ball_x - x)^2 + (ball_y - y)^2) <  10) return true;
 		}
         error += dy;
         if(error > 0){
