@@ -40,6 +40,24 @@ void pixel_buffer_init(int *pixel_ctrl_ptr){
 /*
     KINEMATICS FUNCTIONS
 */
+void update_flipper_end_location(double angle){
+    //update prev
+    for(int i = 0; i < 2; i++){ //left or right flipper
+        //update x and y
+        prev_flipper_end_location[i][0] = flipper_end_location[i][0]; 
+        prev_flipper_end_location[i][1] = flipper_end_location[i][1]; 
+    }
+    //update current
+    int xleft = FLIPPER_L_X + FLIPPER_LENGTH * cos(angle);
+    int yleft = FLIPPER_L_Y + FLIPPER_LENGTH * sin(angle);
+    flipper_end_location[0][0] = xleft;
+    flipper_end_location[0][1] = yleft;
+
+    int xright = FLIPPER_R_X - FLIPPER_LENGTH * cos(angle);
+    int yright = FLIPPER_R_Y + FLIPPER_LENGTH * sin(angle);
+    flipper_end_location[1][0] = xright;
+    flipper_end_location[1][1] = yright;
+}
 
 /* 
     DRAWING FUNCTIONS
@@ -94,23 +112,23 @@ void draw_freeplay_template( ){
 }
 
 void draw_flippers(int angle){
-    int x1 = FLIPPER_L_X + FLIPPER_LENGTH * cos(angle);
-    int y1 = FLIPPER_L_Y + FLIPPER_LENGTH * sin(angle);
-    draw_thick_line(FLIPPER_L_X, FLIPPER_L_Y, x1, y1);
+    int xleft = flipper_end_location[0][0];
+    int yleft = flipper_end_location[0][1];
+    int xright = flipper_end_location[1][0];
+    int yright = flipper_end_location[1][1];
 
-    x1 = FLIPPER_R_X - FLIPPER_LENGTH * cos(angle);
-    y1 = FLIPPER_R_Y + FLIPPER_LENGTH * sin(angle);
-    draw_thick_line(FLIPPER_R_X, FLIPPER_R_Y, x1, y1, WHITE);
+    draw_thick_line(FLIPPER_L_X, FLIPPER_L_Y, xleft, yleft, WHITE);
+    draw_thick_line(FLIPPER_R_X, FLIPPER_R_Y, xright, yright, WHITE);
 }
 
 void erase_flippers(int angle){
-    int x1 = FLIPPER_L_X + FLIPPER_LENGTH * cos(angle);
-    int y1 = FLIPPER_L_Y + FLIPPER_LENGTH * sin(angle);
-    draw_thick_line(FLIPPER_L_X, FLIPPER_L_Y, x1, y1);
+    int xleft = flipper_end_location[0][0];
+    int yleft = flipper_end_location[0][1];
+    int xright = flipper_end_location[1][0];
+    int yright = flipper_end_location[1][1];
 
-    x1 = FLIPPER_R_X - FLIPPER_LENGTH * cos(angle);
-    y1 = FLIPPER_R_Y + FLIPPER_LENGTH * sin(angle);
-    draw_thick_line(FLIPPER_R_X, FLIPPER_R_Y, x1, y1, BLACK);
+    draw_thick_line(FLIPPER_L_X, FLIPPER_L_Y, xleft, yleft, BLACK);
+    draw_thick_line(FLIPPER_R_X, FLIPPER_R_Y, xright, yright, BLACK);
 }
 
 void draw_thick_line(int x0, int y0, int x1, int y1, short int colour){

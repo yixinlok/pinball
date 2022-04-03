@@ -16,21 +16,7 @@
 
 /* VGA colors */
 #define WHITE 0xFFFF
-#define YELLOW 0xFFE0
-#define RED 0xF800
-#define GREEN 0x07E0
-#define BLUE 0x001F
-#define CYAN 0x07FF
-#define MAGENTA 0xF81F
-#define GREY 0xC618
-#define PINK 0xFC18
-#define ORANGE 0xFC00
-
-#define LIGHT_BEIGE 0xffe7c7
-#define MEDIUM_BEIGE 0xc6b28e
-#define DARK_BEIGE 0x8a7c69
-// int light_beige_pixels[18][2] = {};
-// int dark_beige_pixels[23][2] = {};
+#define BLACK 0x0
 
 #define ABS(x) (((x) > 0) ? (x) : -(x))
 
@@ -95,14 +81,13 @@ const int vertical_walls[NUM_VERTICAL_WALLS][3] = {{127, 137, 197}, {259, 137, 1
 // #define FLIPPER_L_X 129
 #define FLIPPER_L_X 152
 #define FLIPPER_L_Y 219
-
 // #define FLIPPER_R_X 210
 #define FLIPPER_R_X 233
 #define FLIPPER_R_Y 219
-
 #define DEFAULT_FLIPPER_ANGLE 0.5350 //in radians, equal to 30 degrees
-// {x0,y0}, {x1,y1} [left(0)/right(1)][start point (0)/ end point (1)][x(0)/y(1)]
-const int flipper_location[2][2][2] = {};
+// {x0,y0}, {x1,y1} [left(0)/right(1)][x(0)/y(1)]
+int flipper_end_location[2][2] = {0, 0};
+int prev_flipper_end_location[2][2] = {0, 0}; 
 
 
 #define BUMPER_DIAMETER 26
@@ -114,7 +99,8 @@ const int flipper_location[2][2][2] = {};
 
 #define BALL_DIAMETER 13
 const uint16_t ball_colours[13][13] = { {65535,65535,65535,65535,50577,50577,50577,50577,50577,65535,65535,65535,65535}, {65535,65535,65535,50577,50577,50577,50577,50577,50577,50577,65535,65535,65535}, {65535,65535,50577,50577,65336,65336,65336,65336,50577,50577,50577,65535,65535}, {65535,50577,50577,65336,65535,65535,65336,50577,50577,50577,50577,35821,65535}, {50577,50577,65336,65535,65535,65336,50577,50577,50577,50577,50577,50577,35821}, {50577,50577,65336,65535,65336,50577,50577,50577,50577,50577,50577,50577,35821}, {50577,50577,65336,65336,50577,50577,50577,50577,50577,50577,50577,35821,35821}, {50577,50577,65336,50577,50577,50577,50577,50577,50577,50577,50577,35821,35821}, {50577,50577,50577,50577,50577,50577,50577,50577,50577,50577,50577,35821,35821}, {65535,50577,50577,50577,50577,50577,50577,50577,50577,50577,35821,35821,65535}, {65535,65535,50577,50577,50577,50577,50577,50577,50577,35821,35821,65535,65535}, {65535,65535,65535,35821,50577,50577,35821,35821,35821,35821,65535,65535,65535}, {65535,65535,65535,65535,35821,35821,35821,35821,35821,65535,65535,65535,65535}, };
+//{x,y}
+int prev_ball_location[2]; //(2d vector) - for buffers
 
-// int prev_ball_location[][]; //(2d vector) - for buffers
-// int prev_flipper_location[][]; //(2d vector)  - for buffers
+
 // int prev_score[][]; // (2d vector)  - for buffers

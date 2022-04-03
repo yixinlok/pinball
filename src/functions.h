@@ -11,6 +11,7 @@ void pixel_buffer_init(int *pixel_ctrl_ptr);
 /*
     KINEMATICS FUNCTIONS
 */
+void update_flipper_end_location(double angle); 
 
 /* 
     DRAWING FUNCTIONS
