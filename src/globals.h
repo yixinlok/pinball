@@ -83,20 +83,25 @@ int collision_type = 0;
 
 #define NUM_SLANTED_WALLS 6
 //{x0,y0}, {x1,y1}
-const int slanted_walls[NUM_SLANTED_WALLS][2][2] = {{{130, 215}, {111,196}}, {{210,215}, {229,196}}, {{111,137}, {93,88}},
-                                          {{229,137}, {247,88}}, {{93,66}, {128,9}},  {{247,66}, {212,9}}};
+// const int slanted_walls[NUM_SLANTED_WALLS][2][2] = {{{130, 215}, {111,196}}, {{210,215}, {229,196}}, {{111,137}, {93,88}},
+//                                           {{229,137}, {247,88}}, {{93,66}, {128,9}},  {{247,66}, {212,9}}};
+const int slanted_walls[NUM_SLANTED_WALLS][2][2] = {{{153, 215}, {134,196}}, {{233,215}, {252,196}}, {{134,137}, {116,88}},
+                                          {{252,137}, {270,88}}, {{116,66}, {151,9}},  {{270,66}, {236,9}}};
 const double slanted_walls_angles[6] = {1.5708, 2.3562, 0.3520, 2.7895, -0.5507,-2.5909};
 
 #define roof 16 //y coordinate
 
 #define NUM_VERTICAL_WALLS 4
 //{x,y_small, y_big}
-const int vertical_walls[NUM_VERTICAL_WALLS][3] = {{104, 137, 197}, {236, 137, 197}, {86, 65, 88},{86, 65, 88}};
+// const int vertical_walls[NUM_VERTICAL_WALLS][3] = {{104, 137, 197}, {236, 137, 197}, {86, 65, 88},{86, 65, 88}};
+const int vertical_walls[NUM_VERTICAL_WALLS][3] = {{127, 137, 197}, {259, 137, 197}, {109, 65, 88},{277, 65, 88}};
 
 #define FLIPPER_LENGTH 10 //in pixels
-#define FLIPPER_L_X 129
+// #define FLIPPER_L_X 129
+#define FLIPPER_L_X 152
 #define FLIPPER_L_Y 219
-#define FLIPPER_R_X 210
+// #define FLIPPER_R_X 210
+#define FLIPPER_R_X 233
 #define FLIPPER_R_Y 219
 const int flipper_angles[] = {};
 
