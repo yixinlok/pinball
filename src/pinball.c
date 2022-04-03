@@ -40,6 +40,12 @@ void pixel_buffer_init(int *pixel_ctrl_ptr){
 /*
     KINEMATICS FUNCTIONS
 */
+// if flipper countdown != 0, this function is called
+void animate_flipper(){
+    update_flipper_end_location(flipper_angles[flipper_angle_counter-1]);
+    flipper_angle_counter -= 1;
+}
+
 void update_flipper_end_location(double angle){
     //update prev
     for(int i = 0; i < 2; i++){ //left or right flipper

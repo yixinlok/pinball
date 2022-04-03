@@ -86,6 +86,9 @@ const int vertical_walls[NUM_VERTICAL_WALLS][3] = {{127, 137, 197}, {259, 137, 1
 #define FLIPPER_R_Y 219
 #define DEFAULT_FLIPPER_ANGLE 0.5350 //in radians, equal to 30 degrees
 // {x0,y0}, {x1,y1} [left(0)/right(1)][x(0)/y(1)]
+#define NUM_FLIPPER_ANGLES 14
+int flipper_angle_counter = 0
+int flipper_angles[NUM_FLIPPER_ANGLES] = {0.48, 0.42, 0.35, 0.28, 0.2, 0.11, 0.01, 0.01, 0.11, 0.2, 0.28, 0.35, 0.42, 0.48};
 int flipper_end_location[2][2] = {0, 0};
 int prev_flipper_end_location[2][2] = {0, 0}; 
 
