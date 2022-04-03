@@ -39,6 +39,7 @@ void plot_pixel(int x, int y, short int line_color)
     *(short int *)(pixel_buffer_start + (y << 10) + (x << 1)) = line_color;
 }
 
+//tested
 void draw_ball(int x, int y){
     for(int j = -6; j <= 6; j++){
         int limit = 6;
@@ -48,6 +49,19 @@ void draw_ball(int x, int y){
         if(j==-3 || j == 3) limit =5;
         for(int i = -limit; i <= limit; i++){
             plot_pixel(x+i, y+j, ball_colours[j+6][i+6]);
+        }
+    }
+}
+
+void erase_ball(int x, int y){
+    for(int j = -6; j <= 6; j++){
+        int limit = 6;
+        if(j==-6 || j == 6) limit =2;
+        if(j==-5 || j == 5) limit =3;
+        if(j==-4 || j == 4) limit =4;
+        if(j==-3 || j == 3) limit =5;
+        for(int i = -limit; i <= limit; i++){
+            plot_pixel(x+i, y+j, freeplay[j+6][i+6]);
         }
     }
 }
