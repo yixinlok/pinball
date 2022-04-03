@@ -31,6 +31,7 @@ void pixel_buffer_init(int *pixel_ctrl_ptr){
 /* 
     DRAWING FUNCTIONS
 */
+
 void plot_pixel(int x, int y, short int line_color)
 {
     *(short int *)(pixel_buffer_start + (y << 10) + (x << 1)) = line_color;
@@ -51,6 +52,14 @@ void draw_ball(int x, int y){
     // LIGHT BEIGE
 
     // DARK BEIGE
+}
+
+void draw_freeplay_template( ){
+    for(int i = 0; i < 320; i++){
+        for(int j = 0; j < 240; j++){
+            plot_pixel(i, j, freeplay[j][i]);
+        }
+    }
 }
 
 void draw_flippers(int angle){
