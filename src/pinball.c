@@ -7,7 +7,7 @@
 #include "resources/freeplay_template.h"
 #include "resources/start_template.h"
 #include "resources/end_template.h"
-
+//asians
 int main(void){
     volatile int * pixel_ctrl_ptr = (int *)PIXEL_BUF_CTRL_BASE;
     pixel_buffer_init(pixel_ctrl_ptr);
@@ -45,14 +45,12 @@ void start(){
     return;
 }
 
-void freeplay(int *pixel_ctrl_ptr){
+void freeplay(){
     collision_type = check_collision(ball_location[0], ball_location[1]);
     erase();
     update();
     draw();
-    
-    wait_for_vsync(); // swap front and back buffers on VGA vertical sync
-    pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
+    //wait for vsync stuff
 }
 
 void end(){
@@ -64,6 +62,7 @@ void end(){
     PHYSICS FUNCTIONS
 */
 void update(){
+
     return;
 }
 
@@ -104,6 +103,9 @@ void draw(){
     draw_flippers();
     draw_ball(ball_location[0], ball_location[1]);
     //draw_score();
+
+    wait_for_vsync(); // swap front and back buffers on VGA vertical sync
+    //pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
 }
 
 void plot_pixel(int x, int y, short int line_color)
