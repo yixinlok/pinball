@@ -42,15 +42,18 @@ int high_score = 0;
 /*
     PHYSICS VARIABLES
 */
-
-double ball_acceleration[2] = {0,-9};
-double ball_velocity[2]; 
-int ball_location[2] = {LAUNCH_X, LAUNCH_Y}; 
-int time;
-
 // #define LAUNCH_X 170
 #define LAUNCH_X 193
 #define LAUNCH_Y 30
+#define LAUNCH_SPEED 35 // launch speed has to be less than 38/s
+int launch_angle; 
+
+
+double ball_acceleration[2] = {0,5};
+double ball_velocity[2]; // magnitude must always be less than 60/s  
+int ball_location[2] = {LAUNCH_X, LAUNCH_Y}; 
+int time;
+
 
 
 /*
@@ -92,7 +95,7 @@ const int vertical_walls[NUM_VERTICAL_WALLS][3] = {{127, 137, 197}, {259, 137, 1
 #define DEFAULT_FLIPPER_ANGLE 0.5350 //in radians, equal to 30 degrees
 // {x0,y0}, {x1,y1} [left(0)/right(1)][x(0)/y(1)]
 #define NUM_FLIPPER_ANGLES 14
-int flipper_angle_counter = 0
+int flipper_angle_counter = 0;
 int flipper_angles[NUM_FLIPPER_ANGLES] = {0.48, 0.42, 0.35, 0.28, 0.2, 0.11, 0.01, 0.01, 0.11, 0.2, 0.28, 0.35, 0.42, 0.48};
 //[L/R][x/y]
 int flipper_end_location[2][2] = {{0, 0},{0, 0}};

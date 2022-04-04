@@ -1,5 +1,7 @@
 {
     "files.associations": {
-        "freeplay_template.h": "c"
+        "freeplay_template.h": "c",
+        "left_slanted_walls.h": "c",
+        "ios": "c"
     }
 }

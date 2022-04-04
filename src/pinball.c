@@ -49,7 +49,7 @@ void start(){
 }
 
 void freeplay(){
-    collide_id = check_collision();
+    collide_id = check_collision(ball_location[0], ball_location[1]);
     erase();
     update();
     draw();
@@ -105,9 +105,9 @@ void draw(){
     draw_flippers();
     draw_ball(ball_location[0], ball_location[1]);
     //draw_score();
-    
+
     wait_for_vsync(); // swap front and back buffers on VGA vertical sync
-    pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
+    //pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
 }
 
 void plot_pixel(int x, int y, short int line_color)
@@ -124,7 +124,7 @@ void draw_ball(int x, int y){
         if(j==-4 || j == 4) limit =4;
         if(j==-3 || j == 3) limit =5;
         for(int i = -limit; i <= limit; i++){
-            plot_pixel(x+i, y+j, ball_colours[j+6][i+6]);
+            if(j<320 && i<240) plot_pixel(x+i, y+j, ball_colours[j+6][i+6]);
         }
     }
 }
@@ -311,17 +311,18 @@ bool check_slanted_wall_collide(int wall_id, int ball_x, int ball_y){
 }
 
 bool check_flipper_collide(int LR, int ball_x, int ball_y){
+    int x0, x1, y0, y1;
     if(LR==0){
-        int x0 = FLIPPER_L_X;
-        int y0 = FLIPPER_L_Y;
-        int x1 = flipper_end_location[0][0];
-        int y1 = flipper_end_location[0][1];
+        x0 = FLIPPER_L_X;
+        y0 = FLIPPER_L_Y;
+        x1 = flipper_end_location[0][0];
+        y1 = flipper_end_location[0][1];
     }
     else{
-        int x0 = FLIPPER_R_X;
-        int y0 = FLIPPER_R_Y;
-        int x1 = slanted_walls[wall_id][1][0];
-        int y1 = slanted_walls[wall_id][1][1];
+        x0 = FLIPPER_R_X;
+        y0 = FLIPPER_R_Y;
+        x1 = flipper_end_location[1][0];
+        y1 = flipper_end_location[1][1];
     }
 
     bool is_steep = abs(y1-y0) > abs(x1-x0);
@@ -346,10 +347,10 @@ bool check_flipper_collide(int LR, int ball_x, int ball_y){
     for(int x = x0; x <= x1; x++){
         if(is_steep){
             //if distance between point on the flipper is smaller than flipper radius + ball radius
-            if(sqrt((ball_x - y)^2 + (ball_y - x)^2) <  10) return true;
+            if(sqrt((ball_x - y)^2 + (ball_y - x)^2) <=  10) return true;
 		}
         else {
-            if(sqrt((ball_x - x)^2 + (ball_y - y)^2) <  10) return true;
+            if(sqrt((ball_x - x)^2 + (ball_y - y)^2) <=  10) return true;
 		}
         error += dy;
         if(error > 0){
