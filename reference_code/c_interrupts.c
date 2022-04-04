@@ -20,7 +20,7 @@ void ps2_keyboard_ISR (void);
 volatile int ticks = 0;
 volatile bool space_bar_pressed = false;
 
-* Main program ********************************************************************************/
+/* Main program ********************************************************************************/
 int main(void){
     // volatile int HPS_timer_LEDG = 0x01000000; // value to turn on the HPS green light LEDG
 
@@ -66,7 +66,7 @@ void enable_interrupts(void){
 
 void config_GIC (){
     // complete this for private timer and
-    
+
     /* configure the HPS timer interrupt */ 
     *((int *) 0xFFFED8C4) = 0x01000000; 
     *((int *) 0xFFFED118) = 0x00000080;

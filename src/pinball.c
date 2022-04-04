@@ -8,8 +8,6 @@
 #include "resources/start_template.h"
 #include "resources/end_template.h"
 
-
-
 int main(void){
     volatile int * pixel_ctrl_ptr = (int *)PIXEL_BUF_CTRL_BASE;
     pixel_buffer_init(pixel_ctrl_ptr);
@@ -26,7 +24,6 @@ int main(void){
 /*
     HARDWARE STUFF
 */
-
 void pixel_buffer_init(int *pixel_ctrl_ptr){
     *(pixel_ctrl_ptr + 1) = FPGA_ONCHIP_BASE; 
     wait_for_vsync();
@@ -49,7 +46,7 @@ void start(){
 }
 
 void freeplay(){
-    collide_id = check_collision(ball_location[0], ball_location[1]);
+    collision_type = check_collision(ball_location[0], ball_location[1]);
     erase();
     update();
     draw();
@@ -243,7 +240,7 @@ void swap(int* p1, int* p2){
     COLLISION CHECKING FUNCTIONS
 */
 int check_collision(int ball_x, int ball_y){
-    int collide_id = 0;
+    int collision_type = 0;
     //check in the following order for optimal speed:
     
     //check straight walls
@@ -265,7 +262,7 @@ int check_collision(int ball_x, int ball_y){
 
     //check bumpers
 
-    return collide_id;
+    return collision_type;
 }
 
 //tested
