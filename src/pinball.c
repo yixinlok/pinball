@@ -14,8 +14,12 @@ int main(void){
     volatile int * pixel_ctrl_ptr = (int *)PIXEL_BUF_CTRL_BASE;
     pixel_buffer_init(pixel_ctrl_ptr);
 
+    // while(1){
+    //     while(state == START) start();
+    //     while(state == FREEPLAY) freeplay();
+    //     while(state == END) end();
+    // }
     
-    clear_screen(); // pixel_buffer_start points to the pixel buffer
     return 1;
 }
 
@@ -35,16 +39,35 @@ void pixel_buffer_init(int *pixel_ctrl_ptr){
 /*
     GAME STATES
 */
+void start(){
+    draw_start_template();
+    //wait for space key to be pressed
+    draw_freeplay_template();
+    //display countdown?
+    //initialise ball velocity, score, etc
+    return;
+}
+
 void freeplay(){
     collide_id = check_collision();
     erase();
-    // update();
+    update();
     draw();
+    //wait for vsync stuff
+}
+
+void end(){
+    draw_end_template();
+    return;
 }
 
 /*
-    KINEMATICS FUNCTIONS
+    PHYSICS FUNCTIONS
 */
+void update(){
+    return;
+}
+
 // if flipper countdown != 0, this function is called
 void animate_flipper(){
     update_flipper_end_location(flipper_angles[flipper_angle_counter-1]);
@@ -82,6 +105,9 @@ void draw(){
     draw_flippers();
     draw_ball(ball_location[0], ball_location[1]);
     //draw_score();
+    
+    wait_for_vsync(); // swap front and back buffers on VGA vertical sync
+    pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
 }
 
 void plot_pixel(int x, int y, short int line_color)
@@ -116,7 +142,7 @@ void erase_ball(int x, int y){
     }
 }
 
-void draw_start_template( ){
+void draw_start_template(){
     for(int i = 0; i < 320; i++){
         for(int j = 0; j < 240; j++){
             plot_pixel(i, j, start[j][i]);
@@ -124,7 +150,15 @@ void draw_start_template( ){
     }
 }
 
-void draw_freeplay_template( ){
+void draw_freeplay_template(){
+    for(int i = 0; i < 320; i++){
+        for(int j = 0; j < 240; j++){
+            plot_pixel(i, j, freeplay[j][i]);
+        }
+    }
+}
+
+void draw_end_template(){
     for(int i = 0; i < 320; i++){
         for(int j = 0; j < 240; j++){
             plot_pixel(i, j, freeplay[j][i]);

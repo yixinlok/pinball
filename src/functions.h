@@ -6,19 +6,25 @@ void pixel_buffer_init(int *pixel_ctrl_ptr);
 /*
     GAME STATES
 */
-
+void start();
+void freeplay();
+void end();
 
 /*
     KINEMATICS FUNCTIONS
 */
+void update();
 void update_flipper_end_location(double angle); 
 
 /* 
     DRAWING FUNCTIONS
 */
+void draw();
+void erase();
 void plot_pixel(int x, int y, short int line_color);
 void draw_start_template( );
 void draw_freeplay_template( );
+void draw_end_template( );
 void draw_ball(int x, int y);
 void erase_ball(int x, int y);
 void draw_flippers(int angle);

@@ -30,6 +30,10 @@
 
 #define FALSE 0
 
+#define START 1
+#define FREEPLAY 2
+#define END 3
+int state = START;
 volatile int pixel_buffer_start; // global variable
 
 int score; 
@@ -38,9 +42,10 @@ int high_score = 0;
 /*
     PHYSICS VARIABLES
 */
+
 double ball_acceleration[2] = {0,-9};
 double ball_velocity[2]; 
-int ball_location[2]; 
+int ball_location[2] = {LAUNCH_X, LAUNCH_Y}; 
 int time;
 
 // #define LAUNCH_X 170
