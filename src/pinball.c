@@ -45,12 +45,14 @@ void start(){
     return;
 }
 
-void freeplay(){
+void freeplay(int *pixel_ctrl_ptr){
     collision_type = check_collision(ball_location[0], ball_location[1]);
     erase();
     update();
     draw();
-    //wait for vsync stuff
+    
+    wait_for_vsync(); // swap front and back buffers on VGA vertical sync
+    pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
 }
 
 void end(){
@@ -102,9 +104,6 @@ void draw(){
     draw_flippers();
     draw_ball(ball_location[0], ball_location[1]);
     //draw_score();
-
-    wait_for_vsync(); // swap front and back buffers on VGA vertical sync
-    //pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
 }
 
 void plot_pixel(int x, int y, short int line_color)
