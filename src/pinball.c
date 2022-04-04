@@ -33,6 +33,14 @@ void pixel_buffer_init(int *pixel_ctrl_ptr){
     pixel_buffer_start = *(pixel_ctrl_ptr + 1);
 }
 
+void wait_for_vsync(){
+    volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
+    int status;
+    * pixel_ctrl_ptr = 1;
+    while(*(pixel_ctrl_ptr + 3)&1);
+    return;
+}
+
 /*
     GAME STATES
 */

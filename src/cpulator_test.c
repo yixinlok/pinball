@@ -23,9 +23,9 @@ const uint16_t ball_colours[13][13] = { {65535,65535,65535,65535,50577,50577,505
 #define FLIPPER_R_Y 219
 #define DEFAULT_FLIPPER_ANGLE 0.5350 //in radians, equal to 30 degrees
 // {x0,y0}, {x1,y1} [left(0)/right(1)][x(0)/y(1)]
-#define NUM_FLIPPER_ANGLES 14
+#define NUM_FLIPPER_ANGLES 60
 int flipper_angle_counter = 0;
-double flipper_angles[NUM_FLIPPER_ANGLES] = {0.48, 0.42, 0.35, 0.28, 0.2, 0.11, 0.01, 0.01, 0.11, 0.2, 0.28, 0.35, 0.42, 0.48};
+double flipper_angles[NUM_FLIPPER_ANGLES] = {0.535,0.49933333334,0.46366666668,0.42800000002,0.39233333336,0.3566666667,0.32100000004,0.28533333338,0.24966666672,0.21400000006,0.1783333334,0.14266666674,0.10700000008,0.0713333334199999,0.0356666667599999,9.99998972517347E-11,0.0356666667599999,0.0713333334199999,0.10700000008,0.14266666674,0.1783333334,0.21400000006,0.24966666672,0.28533333338,0.32100000004,0.3566666667,0.39233333336,0.42800000002,0.46366666668,0.49933333334,0.535,0.49933333334,0.46366666668,0.42800000002,0.39233333336,0.3566666667,0.32100000004,0.28533333338,0.24966666672,0.21400000006,0.1783333334,0.14266666674,0.10700000008,0.0713333334199999,0.0356666667599999,9.99998972517347E-11,0.0356666667599999,0.0713333334199999,0.10700000008,0.14266666674,0.1783333334,0.21400000006,0.24966666672,0.28533333338,0.32100000004,0.3566666667,0.39233333336,0.42800000002,0.46366666668,0.49933333334};
 //[L/R][x/y]
 int flipper_end_location[2][2] = {{0, 0},{0, 0}};
 int prev_flipper_end_location[2][2] = {{0, 0},{0, 0}};
@@ -88,7 +88,7 @@ void draw_thick_line(int x0, int y0, int x1, int y1, short int colour){
     }
 }
 void animate_flipper(){
-    update_flipper_end_location(flipper_angles[flipper_angle_counter-1]);
+    update_flipper_end_location(flipper_angles[flipper_angle_counter]);
     flipper_angle_counter -= 1;
 }
 
@@ -132,6 +132,13 @@ void erase_flippers(){
     draw_thick_line(FLIPPER_R_X, FLIPPER_R_Y, xright, yright, BLACK);
 }
 
+void wait_for_vsync(){
+    volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
+    int status;
+    * pixel_ctrl_ptr = 1;
+    while(*(pixel_ctrl_ptr + 3)&1);
+    return;
+}
 
 int main(void)
 {
@@ -146,12 +153,20 @@ int main(void)
     }
 
 	update_flipper_end_location(DEFAULT_FLIPPER_ANGLE);
+	prev_flipper_end_location[0][0] = flipper_end_location[0][0]; 
+    prev_flipper_end_location[0][1] = flipper_end_location[0][1];
+	prev_flipper_end_location[1][0] = flipper_end_location[1][0]; 
+    prev_flipper_end_location[1][1] = flipper_end_location[1][1];
+	
     draw_flippers();
 
     while(1){
         erase_flippers();
-        if(flipper_angle_counter == 1 ) flipper_angle_counter = NUM_FLIPPER_ANGLES;
+        if(flipper_angle_counter == 0 ) flipper_angle_counter = NUM_FLIPPER_ANGLES-1;
         animate_flipper();
         draw_flippers();
+        wait_for_vsync(); // swap front and back buffers on VGA vertical sync
+    	pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
     }
 }
+
