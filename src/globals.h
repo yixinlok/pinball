@@ -30,31 +30,28 @@
 
 #define FALSE 0
 
-#define START 1
-#define FREEPLAY 2
-#define END 3
-int state = START;
-volatile int pixel_buffer_start; // global variable
+#define START 1 
+#define FREEPLAY 2 
+#define END 3 
+int state = START; 
+volatile int pixel_buffer_start; // global variable 
 
 int score; 
 int high_score = 0; 
 
 /*
-    PHYSICS VARIABLES
+    PHYSICS VARIABLES 
 */
-// #define LAUNCH_X 170
+// #define LAUNCH_X 170 
 #define LAUNCH_X 193
 #define LAUNCH_Y 30
-#define LAUNCH_SPEED 35 // launch speed has to be less than 38/s
+#define LAUNCH_SPEED 35 // launch speed has to be less than 38/s 
 int launch_angle; 
 
 
 double ball_acceleration[2] = {0,5};
 double ball_velocity[2]; // magnitude must always be less than 60/s  
 int ball_location[2] = {LAUNCH_X, LAUNCH_Y}; 
-int time;
-
-
 
 /*
     COLLISION VARIABLES: WALLS FLIPPERS BUMPERS
@@ -94,7 +91,7 @@ const int vertical_walls[NUM_VERTICAL_WALLS][3] = {{127, 137, 197}, {259, 137, 1
 #define FLIPPER_R_Y 219
 #define DEFAULT_FLIPPER_ANGLE 0.5350 //in radians, equal to 30 degrees
 // {x0,y0}, {x1,y1} [left(0)/right(1)][x(0)/y(1)]
-#define NUM_FLIPPER_ANGLES 60
+#define NUM_FLIPPER_ANGLES 14
 int flipper_angle_counter = 0;
 double flipper_angles[NUM_FLIPPER_ANGLES] = {/* This files provides address values that exist in the system */
 

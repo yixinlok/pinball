@@ -32,7 +32,6 @@ void pixel_buffer_init(int *pixel_ctrl_ptr){
     *(pixel_ctrl_ptr + 1) = SDRAM_BASE;
     pixel_buffer_start = *(pixel_ctrl_ptr + 1);
 }
-
 void wait_for_vsync(){
     volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
     int status;
@@ -40,7 +39,6 @@ void wait_for_vsync(){
     while(*(pixel_ctrl_ptr + 3)&1);
     return;
 }
-
 /*
     GAME STATES
 */
@@ -49,7 +47,16 @@ void start(){
     //wait for space key to be pressed
     draw_freeplay_template();
     //display countdown?
+    initialise();
     //initialise ball velocity, score, etc
+    return;
+}
+
+void initialise(){
+    launch_angle = rand() % 361;
+    score = 0;
+    high_score = 0;
+    int LAUNCH_SPEED
     return;
 }
 
@@ -70,7 +77,10 @@ void end(){
     PHYSICS FUNCTIONS
 */
 void update(){
-
+    animate_flipper();
+    update_ball_position();
+    update_ball_velocity();
+    update_score();
     return;
 }
 
@@ -99,6 +109,19 @@ void update_flipper_end_location(double angle){
     flipper_end_location[1][1] = yright;
 }
 
+void update_ball_position(){
+
+
+    return;
+}
+
+void update_ball_velocity(){
+    return;
+}
+
+void update_score(){
+    return;
+}
 /* 
     DRAW AND ERASE FUNCTIONS
 */
