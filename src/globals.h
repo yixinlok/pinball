@@ -144,12 +144,9 @@ int high_score = 0;
 int launch_angle; 
 
 
-double ball_acceleration[2] = {0,5};
+double ball_acceleration[2] = {0,5}; // constant acceleration
 double ball_velocity[2]; // magnitude must always be less than 60/s  
 int ball_location[2] = {LAUNCH_X, LAUNCH_Y}; 
-int time;
-
-
 
 /*
     COLLISION VARIABLES: WALLS FLIPPERS BUMPERS

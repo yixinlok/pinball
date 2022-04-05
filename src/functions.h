@@ -9,11 +9,14 @@ void pixel_buffer_init(int *pixel_ctrl_ptr);
 void start();
 void freeplay();
 void end();
-
+void initialise();
 /*
     KINEMATICS FUNCTIONS
 */
 void update();
+void update_ball_position();
+void update_ball_velocity();
+void update_score();
 void update_flipper_end_location(double angle); 
 
 /* 
@@ -31,6 +34,9 @@ void draw_flippers(int angle);
 void erase_flippers(int angle);
 void draw_thick_line(int x0, int y0, int x1, int y1);
 void draw_box(int x, int y, short int colour);
+void draw_digit(int place, int number, bool high);
+void draw_score();
+
 
 /*
     COLLISION CHECKING FUNCTIONS

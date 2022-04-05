@@ -56,7 +56,8 @@ void initialise(){
     launch_angle = rand() % 361;
     score = 0;
     high_score = 0;
-    // LAUNCH_SPEED;
+    ball_velocity[0] = LAUNCH_SPEED * cos(launch_angle);
+    ball_velocity[1] = LAUNCH_SPEED * sin(launch_angle);
     return;
 }
 
@@ -78,9 +79,9 @@ void end(){
 */
 void update(){
     animate_flipper();
-    update_ball_position();
+    update_score(); // update score first
     update_ball_velocity();
-    update_score();
+    update_ball_position();
     return;
 }
 
@@ -110,16 +111,37 @@ void update_flipper_end_location(double angle){
 }
 
 void update_ball_position(){
-
-
+    ball_location[0] += ball_velocity[0];
+    ball_location[1] += ball_velocity[1];
     return;
 }
 
 void update_ball_velocity(){
+
+    switch(collision_type){
+        case 0: // if no collision
+            ball_velocity[0] += ball_acceleration[0];
+            ball_velocity[1] += ball_acceleration[1];
+            break;
+        case WALL_COLLIDE:
+        // if vertical wall, multiply x component by negative one
+        // if horizontal wall, multiply y component by negative one
+            break;
+        case FLIPPER_COLLIDE: 
+        // ? how poop
+            break; 
+        default: // default case is for bumpers
+        // once again, if top or bottom of bumper, flip y 
+        // if left of right, flip x
+            ball_velocity[0] = ball_velocity[0];
+            break;
+    }
     return;
 }
 
 void update_score(){
+
+
     return;
 }
 /* 
@@ -133,8 +155,7 @@ void erase(){
 void draw(){
     draw_flippers();
     draw_ball(ball_location[0], ball_location[1]);
-    //draw_score();
-
+    draw_score();
     wait_for_vsync(); // swap front and back buffers on VGA vertical sync
     //pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
 }
@@ -153,7 +174,7 @@ void draw_ball(int x, int y){
         if(j==-4 || j == 4) limit =4;
         if(j==-3 || j == 3) limit =5;
         for(int i = -limit; i <= limit; i++){
-            if(j<320 && i<240) plot_pixel(x+i, y+j, ball_colours[i+6][j+6]);
+            if(j<320 && i<240) plot_pixel(x+i, y+j, ball_colours[j+6][i+6]);
         }
     }
 }
@@ -166,7 +187,7 @@ void erase_ball(int x, int y){
         if(j==-4 || j == 4) limit =4;
         if(j==-3 || j == 3) limit =5;
         for(int i = -limit; i <= limit; i++){
-            plot_pixel(x+i, y+j, freeplay[y+j][x+i]);
+            plot_pixel(x+i, y+j, freeplay[j+6][i+6]);
         }
     }
 }
@@ -193,6 +214,57 @@ void draw_end_template(){
             plot_pixel(i, j, freeplay[j][i]);
         }
     }
+}
+
+void draw_digit(int place, int number, bool high){
+    // if high, offset y by certain amount, and recursively call function
+    // if place is 1 or 2, offset x by a certain amount (in negative direction)
+    // smth like x0 - place * 10 and y0 + high * 30
+    if(high)
+        draw_digit(place, number, false);
+
+	switch (number){
+		case 0:
+			//draw_thick_line(67, 127, 67, 117, WHITE);
+			draw_line(67, 127, 67, 117, WHITE);
+			break;
+		case 1:
+			break;
+		case 2:
+			break;
+		case 3:
+			break;
+		case 4:
+			break;
+		case 5:
+			break;
+		case 6:
+			break;
+		case 7:
+			break;
+		case 8:
+			break;
+		case 9:
+			break;
+		default:
+			break;
+	}
+}
+
+void draw_score(){
+
+	int number, digit, place;
+    bool high = 0;
+
+    if(score > high_score)
+        high = 1;
+
+	while (number > 0) {
+		digit = number % 10;
+    	draw_digit(place, digit, high);
+		number /= 10;
+		place++;
+	}
 }
 
 void draw_flippers(){
@@ -376,12 +448,10 @@ bool check_flipper_collide(int LR, int ball_x, int ball_y){
     for(int x = x0; x <= x1; x++){
         if(is_steep){
             //if distance between point on the flipper is smaller than flipper radius + ball radius
-            double a = sqrt(pow((ball_x - y),2) + pow((ball_y - x),2));
-			if(a <=  10) {return true;}
+            if(sqrt((ball_x - y)^2 + (ball_y - x)^2) <=  10) return true;
 		}
         else {
-			double a = sqrt(pow((ball_x - x),2) + pow((ball_y - y),2));
-            if(a <=  10) {return true;}
+            if(sqrt((ball_x - x)^2 + (ball_y - y)^2) <=  10) return true;
 		}
         error += dy;
         if(error > 0){
