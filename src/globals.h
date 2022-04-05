@@ -37,102 +37,7 @@ int state = START;
 volatile int pixel_buffer_start; // global variable 
 
 int score; 
-int high_score = 0; 
-
-/*
-    PHYSICS VARIABLES 
-*/
-// #define LAUNCH_X 170 
-#define LAUNCH_X 193
-#define LAUNCH_Y 30
-#define LAUNCH_SPEED 35 // launch speed has to be less than 38/s 
-int launch_angle; 
-
-
-double ball_acceleration[2] = {0,5};
-double ball_velocity[2]; // magnitude must always be less than 60/s  
-int ball_location[2] = {LAUNCH_X, LAUNCH_Y}; 
-
-/*
-    COLLISION VARIABLES: WALLS FLIPPERS BUMPERS
-*/
-int collision_type = 0; 
-#define WALL_COLLIDE 1
-#define FLIPPER_COLLIDE 2
-#define BUMPER_1_COLLIDE -1
-#define BUMPER_2_COLLIDE -2
-#define BUMPER_3_COLLIDE -3
-#define BUMPER_4_COLLIDE -4
-#define BUMPER_5_COLLIDE -5
-
-
-#define NUM_SLANTED_WALLS 6
-//{x0,y0}, {x1,y1}
-// const int slanted_walls[NUM_SLANTED_WALLS][2][2] = {{{130, 215}, {111,196}}, {{210,215}, {229,196}}, {{111,137}, {93,88}},
-//                                           {{229,137}, {247,88}}, {{93,66}, {128,9}},  {{247,66}, {212,9}}};
-const int slanted_walls[NUM_SLANTED_WALLS][2][2] = {{{153, 215}, {134,196}}, {{233,215}, {252,196}}, {{134,137}, {116,88}},
-                                          {{252,137}, {270,88}}, {{116,66}, {151,9}},  {{270,66}, {236,9}}};
-//these angles are not relative to the pixel coordinates, they are relative to user
-const double slanted_walls_angles[6] = {1.5708, 2.3562, 0.3520, 2.7895, -0.5507,-2.5909}; //in radians
-
-#define roof 16 //y coordinate
-
-#define NUM_VERTICAL_WALLS 4
-//{x,y_small, y_big}
-// const int vertical_walls[NUM_VERTICAL_WALLS][3] = {{104, 137, 197}, {236, 137, 197}, {86, 65, 88},{86, 65, 88}};
-const int vertical_walls[NUM_VERTICAL_WALLS][3] = {{127, 137, 197}, {259, 137, 197}, {109, 65, 88},{277, 65, 88}};
-
-#define FLIPPER_LENGTH 10 //in pixels
-// #define FLIPPER_L_X 129
-#define FLIPPER_L_X 152
-#define FLIPPER_L_Y 219
-// #define FLIPPER_R_X 210
-#define FLIPPER_R_X 233
-#define FLIPPER_R_Y 219
-#define DEFAULT_FLIPPER_ANGLE 0.5350 //in radians, equal to 30 degrees
-// {x0,y0}, {x1,y1} [left(0)/right(1)][x(0)/y(1)]
-#define NUM_FLIPPER_ANGLES 14
-int flipper_angle_counter = 0;
-double flipper_angles[NUM_FLIPPER_ANGLES] = {/* This files provides address values that exist in the system */
-
-#define SDRAM_BASE            0xC0000000
-#define FPGA_ONCHIP_BASE      0xC8000000
-#define FPGA_CHAR_BASE        0xC9000000
-
-/* Cyclone V FPGA devices */
-#define LEDR_BASE             0xFF200000
-#define HEX3_HEX0_BASE        0xFF200020
-#define HEX5_HEX4_BASE        0xFF200030
-#define SW_BASE               0xFF200040
-#define KEY_BASE              0xFF200050
-#define TIMER_BASE            0xFF202000
-#define PIXEL_BUF_CTRL_BASE   0xFF203020
-#define CHAR_BUF_CTRL_BASE    0xFF203030
-
-/* VGA colors */
-#define WHITE 0xFFFF
-#define BLACK 0x0
-
-#define ABS(x) (((x) > 0) ? (x) : -(x))
-
-/* Screen size. */
-#define RESOLUTION_X 320
-#define RESOLUTION_Y 240
-
-/* Constants for animation */
-#define BOX_LEN 2
-#define NUM_BOXES 8
-
-#define FALSE 0
-
-#define START 1
-#define FREEPLAY 2
-#define END 3
-int state = 1;
-volatile int pixel_buffer_start; // global variable
-
-int score; 
-int high_score = 0; 
+int high_score = 0 ;
 
 /*
     PHYSICS VARIABLES
@@ -142,7 +47,6 @@ int high_score = 0;
 #define LAUNCH_Y 30
 #define LAUNCH_SPEED 35 // launch speed has to be less than 38/s
 int launch_angle; 
-
 
 double ball_acceleration[2] = {0,5}; // constant acceleration
 double ball_velocity[2]; // magnitude must always be less than 60/s  

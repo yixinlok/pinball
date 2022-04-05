@@ -28,7 +28,7 @@ void pixel_buffer_init(int *pixel_ctrl_ptr){
     *(pixel_ctrl_ptr + 1) = FPGA_ONCHIP_BASE; 
     wait_for_vsync();
     pixel_buffer_start = *pixel_ctrl_ptr;
-    clear_screen(); 
+    draw_start_template();
     *(pixel_ctrl_ptr + 1) = SDRAM_BASE;
     pixel_buffer_start = *(pixel_ctrl_ptr + 1);
 }
