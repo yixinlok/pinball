@@ -56,7 +56,7 @@ void initialise(){
     launch_angle = rand() % 361;
     score = 0;
     high_score = 0;
-    LAUNCH_SPEED
+    // LAUNCH_SPEED;
     return;
 }
 
@@ -153,7 +153,7 @@ void draw_ball(int x, int y){
         if(j==-4 || j == 4) limit =4;
         if(j==-3 || j == 3) limit =5;
         for(int i = -limit; i <= limit; i++){
-            if(j<320 && i<240) plot_pixel(x+i, y+j, ball_colours[j+6][i+6]);
+            if(j<320 && i<240) plot_pixel(x+i, y+j, ball_colours[i+6][j+6]);
         }
     }
 }
@@ -166,7 +166,7 @@ void erase_ball(int x, int y){
         if(j==-4 || j == 4) limit =4;
         if(j==-3 || j == 3) limit =5;
         for(int i = -limit; i <= limit; i++){
-            plot_pixel(x+i, y+j, freeplay[j+6][i+6]);
+            plot_pixel(x+i, y+j, freeplay[y+j][x+i]);
         }
     }
 }
@@ -376,10 +376,12 @@ bool check_flipper_collide(int LR, int ball_x, int ball_y){
     for(int x = x0; x <= x1; x++){
         if(is_steep){
             //if distance between point on the flipper is smaller than flipper radius + ball radius
-            if(sqrt((ball_x - y)^2 + (ball_y - x)^2) <=  10) return true;
+            double a = sqrt(pow((ball_x - y),2) + pow((ball_y - x),2));
+			if(a <=  10) {return true;}
 		}
         else {
-            if(sqrt((ball_x - x)^2 + (ball_y - y)^2) <=  10) return true;
+			double a = sqrt(pow((ball_x - x),2) + pow((ball_y - y),2));
+            if(a <=  10) {return true;}
 		}
         error += dy;
         if(error > 0){
