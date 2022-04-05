@@ -56,7 +56,7 @@ void initialise(){
     launch_angle = rand() % 361;
     score = 0;
     high_score = 0;
-    int LAUNCH_SPEED
+    LAUNCH_SPEED
     return;
 }
 
