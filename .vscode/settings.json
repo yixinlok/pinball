@@ -2,6 +2,8 @@
     "files.associations": {
         "freeplay_template.h": "c",
         "left_slanted_walls.h": "c",
-        "ios": "c"
+        "ios": "c",
+        "start_template.h": "c",
+        "end_template.h": "c"
     }
 }

@@ -2,6 +2,8 @@
     HARDWARE STUFF
 */
 void pixel_buffer_init(int *pixel_ctrl_ptr);
+bool check_key_press();
+void wait_for_vsync();
 
 /*
     GAME STATES
@@ -17,6 +19,8 @@ void update();
 void update_ball_position();
 void update_ball_velocity();
 void update_score();
+void update_flippers();
+void animate_flippers();
 void update_flipper_end_location(double angle); 
 
 /* 

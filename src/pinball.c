@@ -4,9 +4,9 @@
 #include <math.h>
 #include "globals.h"
 #include "address_map_arm.h"
-#include "resources/freeplay_template.h"
-#include "resources/start_template.h"
-#include "resources/end_template.h"
+#include "../resources/freeplay_template.h"
+#include "../resources/start_template.h"
+#include "../resources/end_template.h"
 //asians
 int main(void){
     volatile int * pixel_ctrl_ptr = (int *)PIXEL_BUF_CTRL_BASE;
@@ -39,6 +39,16 @@ void wait_for_vsync(){
     while(*(pixel_ctrl_ptr + 3)&1);
     return;
 }
+
+bool check_key_press(){
+    volatile int * keyboard_ptr = (int *) PS2_BASE; 
+	int keyboard_data, RVALID;
+    keyboard_data = * keyboard_ptr;
+	RVALID = keyboard_data & 0x8000;
+    if(RVALID) return true;
+    else return false;
+}
+
 /*
     GAME STATES
 */
@@ -78,16 +88,21 @@ void end(){
     PHYSICS FUNCTIONS
 */
 void update(){
-    animate_flipper();
+    update_flippers();
     update_score(); // update score first
     update_ball_velocity();
     update_ball_position();
     return;
 }
 
-// if flipper countdown != 0, this function is called
+void update_flippers(){
+    if(check_key_press()) flipper_angle_counter = NUM_FLIPPER_ANGLES-1;
+    if(flipper_angle_counter >= 0 ) animate_flipper();
+}
+
+// if flipper countdown >= 0, this function is called
 void animate_flipper(){
-    update_flipper_end_location(flipper_angles[flipper_angle_counter-1]);
+    update_flipper_end_location(flipper_angles[flipper_angle_counter]);
     flipper_angle_counter -= 1;
 }
 
@@ -111,8 +126,8 @@ void update_flipper_end_location(double angle){
 }
 
 void update_ball_position(){
-    ball_location[0] += ball_velocity[0];
-    ball_location[1] += ball_velocity[1];
+    ball_location[0] += round (ball_velocity[0] / 60);
+    ball_location[1] += round (ball_velocity[1] / 60);
     return;
 }
 
@@ -120,8 +135,8 @@ void update_ball_velocity(){
 
     switch(collision_type){
         case 0: // if no collision
-            ball_velocity[0] += ball_acceleration[0];
-            ball_velocity[1] += ball_acceleration[1];
+            ball_velocity[0] += ball_acceleration[0] / 60;
+            ball_velocity[1] += ball_acceleration[1] / 60;
             break;
         case WALL_COLLIDE:
         // if vertical wall, multiply x component by negative one
@@ -174,7 +189,7 @@ void draw_ball(int x, int y){
         if(j==-4 || j == 4) limit =4;
         if(j==-3 || j == 3) limit =5;
         for(int i = -limit; i <= limit; i++){
-            if(j<320 && i<240) plot_pixel(x+i, y+j, ball_colours[j+6][i+6]);
+            if(j<320 && i<240) plot_pixel(x+i, y+j, ball_colours[y+j][x+i]);
         }
     }
 }
