@@ -8,13 +8,14 @@ void wait_for_vsync();
 /*
     GAME STATES
 */
-void start();
-void freeplay();
-void end();
+void start(int *pixel_ctrl_ptr);
+void freeplay(int *pixel_ctrl_ptr);
+void end(int *pixel_ctrl_ptr);
 void initialise();
 /*
     KINEMATICS FUNCTIONS
 */
+void update_prev();
 void update();
 void update_ball_position();
 void update_ball_velocity();
@@ -26,7 +27,7 @@ void update_flipper_end_location(double angle);
 /* 
     DRAWING FUNCTIONS
 */
-void draw();
+void draw(int *pixel_ctrl_ptr);
 void erase();
 void plot_pixel(int x, int y, short int line_color);
 void draw_start_template( );

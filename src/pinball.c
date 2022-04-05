@@ -12,11 +12,12 @@ int main(void){
     volatile int * pixel_ctrl_ptr = (int *)PIXEL_BUF_CTRL_BASE;
     pixel_buffer_init(pixel_ctrl_ptr);
 
-    // while(1){
-    //     while(state == START) start();
-    //     while(state == FREEPLAY) freeplay();
-    //     while(state == END) end();
-    // }
+    while(1){
+        if(state == START) start(pixel_ctrl_ptr);
+        while(state == FREEPLAY) freeplay(pixel_ctrl_ptr);
+        if(state == END) end(pixel_ctrl_ptr);
+        if (state != START && state != FREEPLAY && state != END) printf("error: invalid state\n");
+    }
     
     return 1;
 }
@@ -27,13 +28,15 @@ int main(void){
 void pixel_buffer_init(int *pixel_ctrl_ptr){
     *(pixel_ctrl_ptr + 1) = FPGA_ONCHIP_BASE; 
     wait_for_vsync();
+    
     pixel_buffer_start = *pixel_ctrl_ptr;
-    draw_start_template();
+
     *(pixel_ctrl_ptr + 1) = SDRAM_BASE;
     pixel_buffer_start = *(pixel_ctrl_ptr + 1);
 }
+
 void wait_for_vsync(){
-    volatile int * pixel_ctrl_ptr = (int *)0xFF203020;
+    volatile int * pixel_ctrl_ptr = (int *)PIXEL_BUF_CTRL_BASE;
     int status;
     * pixel_ctrl_ptr = 1;
     while(*(pixel_ctrl_ptr + 3)&1);
@@ -52,13 +55,32 @@ bool check_key_press(){
 /*
     GAME STATES
 */
-void start(){
-    draw_start_template();
-    //wait for space key to be pressed
-    draw_freeplay_template();
-    //display countdown?
+void start(int *pixel_ctrl_ptr){
+    // draw start template on both buffers
+    for(int i = 0; i < 2; i++){
+        draw_start_template();
+        wait_for_vsync(); 
+        pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+    }
+    
+    // wait to go to next screen
+    while(!check_key_press()) {;}
+
+    // draw freeplay template on both buffers
+    for(int i = 0; i < 2; i++){
+        draw_freeplay_template();
+        wait_for_vsync(); 
+        pixel_buffer_start = *(pixel_ctrl_ptr + 1); 
+    }
+    //initialise
     initialise();
-    //initialise ball velocity, score, etc
+
+    //buffer for 4s
+    for(int i = 0; i < 60*4; i++){
+        wait_for_vsync();
+    }
+
+    state = FREEPLAY;
     return;
 }
 
@@ -71,16 +93,26 @@ void initialise(){
     return;
 }
 
-void freeplay(){
+void freeplay(int *pixel_ctrl_ptr){
     collision_type = check_collision(ball_location[0], ball_location[1]);
     erase();
+    update_prev();
     update();
-    draw();
-    //wait for vsync stuff
+    draw(pixel_ctrl_ptr);
+    
+    if(lose) state = END;   
 }
 
-void end(){
-    draw_end_template();
+void end(int *pixel_ctrl_ptr){
+    for(int i = 0; i < 2; i++){
+        draw_end_template();
+        wait_for_vsync(); 
+        pixel_buffer_start = *(pixel_ctrl_ptr + 1);
+    }
+
+    while(!check_key_press()) {;}
+
+    state = START;
     return;
 }
 
@@ -95,6 +127,17 @@ void update(){
     return;
 }
 
+void update_prev(){
+    // flippers
+    prev_flipper_end_location[0][0] = flipper_end_location[0][0]; 
+    prev_flipper_end_location[0][1] = flipper_end_location[0][1]; 
+    prev_flipper_end_location[1][0] = flipper_end_location[1][0]; 
+    prev_flipper_end_location[1][1] = flipper_end_location[1][1]; 
+    // ball
+    prev_ball_location[0] = ball_location[0]; 
+    prev_ball_location[1] = ball_location[1]; 
+}
+
 void update_flippers(){
     if(check_key_press()) flipper_angle_counter = NUM_FLIPPER_ANGLES-1;
     if(flipper_angle_counter >= 0 ) animate_flipper();
@@ -106,13 +149,9 @@ void animate_flipper(){
     flipper_angle_counter -= 1;
 }
 
+
 void update_flipper_end_location(double angle){
-    //update prev
-    for(int i = 0; i < 2; i++){ //left or right flipper
-        //update x and y
-        prev_flipper_end_location[i][0] = flipper_end_location[i][0]; 
-        prev_flipper_end_location[i][1] = flipper_end_location[i][1]; 
-    }
+    
     //update current
     int xleft = FLIPPER_L_X + FLIPPER_LENGTH * cos(angle);
     int yleft = FLIPPER_L_Y + FLIPPER_LENGTH * sin(angle);
@@ -167,12 +206,13 @@ void erase(){
     erase_ball(prev_ball_location[0], prev_ball_location[1]);
 }
 
-void draw(){
+void draw(int *pixel_ctrl_ptr){
     draw_flippers();
     draw_ball(ball_location[0], ball_location[1]);
     draw_score();
+
     wait_for_vsync(); // swap front and back buffers on VGA vertical sync
-    //pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
+    pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
 }
 
 void plot_pixel(int x, int y, short int line_color)

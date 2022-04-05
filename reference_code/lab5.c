@@ -56,8 +56,7 @@ int main(void)
     // initialize location and direction of rectangles(not shown)
 
     /* set front pixel buffer to start of FPGA On-chip memory */
-    *(pixel_ctrl_ptr + 1) = 0xC8000000; // first store the address in the 
-                                        // back buffer
+    *(pixel_ctrl_ptr + 1) = 0xC8000000; // first store the address in the back buffer
     /* now, swap the front/back buffers, to set the front buffer location */
     wait_for_vsync();
     /* initialize a pointer to the pixel buffer, used by drawing functions */

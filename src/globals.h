@@ -36,6 +36,7 @@
 int state = START; 
 volatile int pixel_buffer_start; // global variable 
 
+bool lose;
 int score; 
 int high_score = 0 ;
 
