@@ -25,7 +25,7 @@ int main(void){
 /*
     HARDWARE STUFF
 */
-void pixel_buffer_init(int *pixel_ctrl_ptr){
+void pixel_buffer_init(volatile int *pixel_ctrl_ptr){
     *(pixel_ctrl_ptr + 1) = FPGA_ONCHIP_BASE; 
     wait_for_vsync();
     
@@ -37,7 +37,6 @@ void pixel_buffer_init(int *pixel_ctrl_ptr){
 
 void wait_for_vsync(){
     volatile int * pixel_ctrl_ptr = (int *)PIXEL_BUF_CTRL_BASE;
-    int status;
     * pixel_ctrl_ptr = 1;
     while(*(pixel_ctrl_ptr + 3)&1);
     return;
@@ -55,7 +54,7 @@ bool check_key_press(){
 /*
     GAME STATES
 */
-void start(int *pixel_ctrl_ptr){
+void start(volatile int *pixel_ctrl_ptr){
     // draw start template on both buffers
     for(int i = 0; i < 2; i++){
         draw_start_template();
@@ -93,7 +92,7 @@ void initialise(){
     return;
 }
 
-void freeplay(int *pixel_ctrl_ptr){
+void freeplay(volatile int *pixel_ctrl_ptr){
     collision_type = check_collision(ball_location[0], ball_location[1]);
     erase();
     update_prev();
@@ -103,7 +102,7 @@ void freeplay(int *pixel_ctrl_ptr){
     if(lose) state = END;   
 }
 
-void end(int *pixel_ctrl_ptr){
+void end(volatile int *pixel_ctrl_ptr){
     for(int i = 0; i < 2; i++){
         draw_end_template();
         wait_for_vsync(); 
@@ -140,11 +139,11 @@ void update_prev(){
 
 void update_flippers(){
     if(check_key_press()) flipper_angle_counter = NUM_FLIPPER_ANGLES-1;
-    if(flipper_angle_counter >= 0 ) animate_flipper();
+    if(flipper_angle_counter >= 0 ) animate_flippers();
 }
 
 // if flipper countdown >= 0, this function is called
-void animate_flipper(){
+void animate_flippers(){
     update_flipper_end_location(flipper_angles[flipper_angle_counter]);
     flipper_angle_counter -= 1;
 }
@@ -206,7 +205,7 @@ void erase(){
     erase_ball(prev_ball_location[0], prev_ball_location[1]);
 }
 
-void draw(int *pixel_ctrl_ptr){
+void draw(volatile int *pixel_ctrl_ptr){
     draw_flippers();
     draw_ball(ball_location[0], ball_location[1]);
     draw_score();
@@ -242,7 +241,7 @@ void erase_ball(int x, int y){
         if(j==-4 || j == 4) limit =4;
         if(j==-3 || j == 3) limit =5;
         for(int i = -limit; i <= limit; i++){
-            plot_pixel(x+i, y+j, freeplay[j+6][i+6]);
+            plot_pixel(x+i, y+j, freeplay_template[y+j][x+i]);
         }
     }
 }
@@ -250,7 +249,7 @@ void erase_ball(int x, int y){
 void draw_start_template(){
     for(int i = 0; i < 320; i++){
         for(int j = 0; j < 240; j++){
-            plot_pixel(i, j, start[j][i]);
+            plot_pixel(i, j, start_template[j][i]);
         }
     }
 }
@@ -258,7 +257,7 @@ void draw_start_template(){
 void draw_freeplay_template(){
     for(int i = 0; i < 320; i++){
         for(int j = 0; j < 240; j++){
-            plot_pixel(i, j, freeplay[j][i]);
+            plot_pixel(i, j, freeplay_template[j][i]);
         }
     }
 }
@@ -266,7 +265,7 @@ void draw_freeplay_template(){
 void draw_end_template(){
     for(int i = 0; i < 320; i++){
         for(int j = 0; j < 240; j++){
-            plot_pixel(i, j, freeplay[j][i]);
+            plot_pixel(i, j, freeplay_template[j][i]);
         }
     }
 }
@@ -281,7 +280,6 @@ void draw_digit(int place, int number, bool high){
 	switch (number){
 		case 0:
 			//draw_thick_line(67, 127, 67, 117, WHITE);
-			draw_line(67, 127, 67, 117, WHITE);
 			break;
 		case 1:
 			break;
@@ -309,6 +307,8 @@ void draw_digit(int place, int number, bool high){
 void draw_score(){
 
 	int number, digit, place;
+    number = score;
+    place = 0;
     bool high = 0;
 
     if(score > high_score)
@@ -432,7 +432,6 @@ bool check_slanted_wall_collide(int wall_id, int ball_x, int ball_y){
     int y1 = slanted_walls[wall_id][1][1];
 
     bool is_steep = abs(y1-y0) > abs(x1-x0);
-    int temp;
     if(is_steep){
         swap(&x0, &y0);
         swap(&x1, &y1);
@@ -503,10 +502,12 @@ bool check_flipper_collide(int LR, int ball_x, int ball_y){
     for(int x = x0; x <= x1; x++){
         if(is_steep){
             //if distance between point on the flipper is smaller than flipper radius + ball radius
-            if(sqrt((ball_x - y)^2 + (ball_y - x)^2) <=  10) return true;
+            double a = sqrt(pow((ball_x - y),2) + pow((ball_y - x),2));
+			if(a <=  10) {return true;}
 		}
         else {
-            if(sqrt((ball_x - x)^2 + (ball_y - y)^2) <=  10) return true;
+			double a = sqrt(pow((ball_x - x),2) + pow((ball_y - y),2));
+            if(a <=  10) {return true;}
 		}
         error += dy;
         if(error > 0){
