@@ -92,11 +92,11 @@ void start(volatile int *pixel_ctrl_ptr){
 
 void initialise(){
 
-    srand(time(0));
+	srand(time(0));
 
     launch_angle = rand() % 360;
-    launch_angle = 90;
-    launch_angle *= DEGREES_TO_RADS;
+    launch_angle = -90;
+	launch_angle *= DEGREES_TO_RADS;
     score = 0;
     lose =0;
     ball_location[0] = LAUNCH_X;
@@ -107,9 +107,9 @@ void initialise(){
     prev_ball_location[1] = LAUNCH_Y;
 
     update_flipper_end_location(DEFAULT_FLIPPER_ANGLE);
-    prev_flipper_end_location[0][0] = flipper_end_location[0][0]; 
+	prev_flipper_end_location[0][0] = flipper_end_location[0][0]; 
     prev_flipper_end_location[0][1] = flipper_end_location[0][1];
-    prev_flipper_end_location[1][0] = flipper_end_location[1][0]; 
+	prev_flipper_end_location[1][0] = flipper_end_location[1][0]; 
     prev_flipper_end_location[1][1] = flipper_end_location[1][1];
 
     ball_velocity[0] = LAUNCH_SPEED * cos(launch_angle);
@@ -136,6 +136,7 @@ void end(volatile int *pixel_ctrl_ptr){
     
     for(int i = 0; i < 2; i++){
         draw_end_template();
+        draw_score();
         wait_for_vsync(); 
         pixel_buffer_start = *(pixel_ctrl_ptr + 1);
     }
@@ -438,9 +439,21 @@ void draw_digit(int place, int number, bool high){
     // if place is 1 or 2, offset x by a certain amount (in negative direction)
     // smth like x0 - place * 10 and y0 + high * 30
     // void plot_pixel(int x, int y, short int line_color)
+    int x, y, i, j;
     
-    int x=72, y=119;
-    int i, j;
+    // lose
+    if(lose){
+        x=135; y=102;
+        for(i=x; i < x+9; i++){
+            for(j=y; j < y+12; j++){
+                plot_pixel(i-place*9, j+high*23, numbers[j-y][i-x+number*9]);
+            }
+        }
+        return;
+    }
+    
+    // freeplay
+    x=72; y=119;
     for(i=x; i < x+9; i++){
         for(j=y; j < y+12; j++){
             plot_pixel(i-place*9, j+high*41, numbers[j-y][i-x+number*9]);
@@ -448,9 +461,9 @@ void draw_digit(int place, int number, bool high){
     }
 }
 
+
 void draw_score(){
-   
-    prev_score = score;
+
 
     bool high = 0;
     int number, digit, place;
