@@ -6,9 +6,9 @@
 
 #include "globals.h"
 #include "address_map_arm.h"
-#include "../resources/freeplay_template.h"
-#include "../resources/start_template.h"
-#include "../resources/end_template.h"
+// #include "../resources/freeplay_template.h"
+// #include "../resources/start_template.h"
+// #include "../resources/end_template.h"
 
 int main(void){
     volatile int * pixel_ctrl_ptr = (int *)PIXEL_BUF_CTRL_BASE;
@@ -92,20 +92,24 @@ void start(volatile int *pixel_ctrl_ptr){
 
 void initialise(){
 
-	srand(time(0));
+    srand(time(0));
 
     launch_angle = rand() % 360;
-	launch_angle *= DEGREES_TO_RADS;
+    launch_angle = 90;
+    launch_angle *= DEGREES_TO_RADS;
     score = 0;
-    high_score = 0;
-
+    lose =0;
+    ball_location[0] = LAUNCH_X;
+    ball_location[1] = LAUNCH_Y;
+    ball_position[0] = LAUNCH_X;
+    ball_position[1] = LAUNCH_Y;
     prev_ball_location[0] = LAUNCH_X;
     prev_ball_location[1] = LAUNCH_Y;
 
     update_flipper_end_location(DEFAULT_FLIPPER_ANGLE);
-	prev_flipper_end_location[0][0] = flipper_end_location[0][0]; 
+    prev_flipper_end_location[0][0] = flipper_end_location[0][0]; 
     prev_flipper_end_location[0][1] = flipper_end_location[0][1];
-	prev_flipper_end_location[1][0] = flipper_end_location[1][0]; 
+    prev_flipper_end_location[1][0] = flipper_end_location[1][0]; 
     prev_flipper_end_location[1][1] = flipper_end_location[1][1];
 
     ball_velocity[0] = LAUNCH_SPEED * cos(launch_angle);
@@ -122,6 +126,8 @@ void freeplay(volatile int *pixel_ctrl_ptr){
     update();
     draw(pixel_ctrl_ptr);
     
+    if(ball_location[1] >= 239)
+            lose=1;
     if(lose) 
         state = END;   
 }
@@ -385,7 +391,7 @@ void draw_ball(int x, int y){
         if(j==-4 || j == 4) limit =4;
         if(j==-3 || j == 3) limit =5;
         for(int i = -limit; i <= limit; i++){
-            if(j<320 && i<240) plot_pixel(x+i, y+j, ball_colours[j+6][i+6]);
+            if(x+i <RESOLUTION_X && y+j <RESOLUTION_Y) plot_pixel(x+i, y+j, freeplay_template[y+j][x+i]);
         }
     }
 }
@@ -398,7 +404,7 @@ void erase_ball(int x, int y){
         if(j==-4 || j == 4) limit =4;
         if(j==-3 || j == 3) limit =5;
         for(int i = -limit; i <= limit; i++){
-            plot_pixel(x+i, y+j, freeplay_template[y+j][x+i]);
+            if(x+i <RESOLUTION_X && y+j <RESOLUTION_Y) plot_pixel(x+i, y+j, freeplay_template[y+j][x+i]);
         }
     }
 }
@@ -422,66 +428,50 @@ void draw_freeplay_template(){
 void draw_end_template(){
     for(int i = 0; i < 320; i++){
         for(int j = 0; j < 240; j++){
-            plot_pixel(i, j, freeplay_template[j][i]);
+            plot_pixel(i, j, end_template[j][i]);
         }
     }
 }
 
 void draw_digit(int place, int number, bool high){
-    // if high, offset y by certain amount, and recursively call function
+    // if high, offset y by certain amount
     // if place is 1 or 2, offset x by a certain amount (in negative direction)
     // smth like x0 - place * 10 and y0 + high * 30
-    if(high)
-        draw_digit(place, number, false);
-
-	switch (number){
-		case 0:
-			//draw_thick_line(67, 127, 67, 117, WHITE);
-			break;
-		case 1:
-			break;
-		case 2:
-			break;
-		case 3:
-			break;
-		case 4:
-			break;
-		case 5:
-			break;
-		case 6:
-			break;
-		case 7:
-			break;
-		case 8:
-			break;
-		case 9:
-			break;
-		default:
-			break;
-	}
+    // void plot_pixel(int x, int y, short int line_color)
+    
+    int x=72, y=119;
+    int i, j;
+    for(i=x; i < x+9; i++){
+        for(j=y; j < y+12; j++){
+            plot_pixel(i-place*9, j+high*41, numbers[j-y][i-x+number*9]);
+        }
+    }
 }
 
 void draw_score(){
-
-    if(prev_score == score)
-        return;
-    
+   
     prev_score = score;
 
     bool high = 0;
-	int number, digit, place;
+    int number, digit, place;
     number = score;
     place = 0;
 
-    if(score > high_score)
-        high = 1;
-
-	while (number > 0) {
-		digit = number % 10;
-    	draw_digit(place, digit, high);
-		number /= 10;
-		place++;
-	}
+    while (number > 0) {
+        digit = number % 10;
+        draw_digit(place, digit, 0);
+        number /= 10;
+        place++;
+    }
+    
+    number = high_score;
+    place = 0;
+    while (number > 0) {
+        digit = number % 10;
+        draw_digit(place, digit, 1);
+        number /= 10;
+        place++;
+    }
 }
 
 void draw_flippers(){
