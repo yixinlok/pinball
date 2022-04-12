@@ -37,8 +37,9 @@ int state = START;
 volatile int pixel_buffer_start; // global variable 
 
 bool lose;
-int score; 
+int score = 0; 
 int high_score = 0 ;
+int prev_score = 0;
 
 /*
     PHYSICS VARIABLES

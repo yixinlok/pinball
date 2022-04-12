@@ -329,7 +329,28 @@ void update_ball_velocity(){
 
 void update_score(){
 
+    switch(collision_type){
+        case BUMPER_1_COLLIDE:
+            score += 50;
+            break;
+        case BUMPER_2_COLLIDE:
+            score += 100;
+            break;
+        case BUMPER_3_COLLIDE:
+            score += 50;
+            break;
+        case BUMPER_4_COLLIDE:
+            score += 10;
+            break;
+        case BUMPER_5_COLLIDE:
+            score += 10;
+            break;
+        default:
+            break;
+    }
 
+    if(score>high_score)
+        high_score = score;
 
     return;
 }
@@ -442,10 +463,15 @@ void draw_digit(int place, int number, bool high){
 
 void draw_score(){
 
+    if(prev_score == score)
+        return;
+    
+    prev_score = score;
+
+    bool high = 0;
 	int number, digit, place;
     number = score;
     place = 0;
-    bool high = 0;
 
     if(score > high_score)
         high = 1;
