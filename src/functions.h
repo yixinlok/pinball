@@ -49,6 +49,7 @@ void draw_score();
 int check_collision(int ball_x, int ball_y);
 bool check_slanted_wall_collide(int wall_id, int ball_x, int ball_y);
 bool check_flipper_collide(int LR, int ball_x, int ball_y);
+bool check_bumper_collide(int bumper_id, int ball_x, int ball_y);
 /*
     MISCELLANEOUS + HELPER FUNCTIONS
 */

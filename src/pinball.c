@@ -2,23 +2,28 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <math.h>
+#include <time.h>
+
 #include "globals.h"
 #include "address_map_arm.h"
 #include "../resources/freeplay_template.h"
 #include "../resources/start_template.h"
 #include "../resources/end_template.h"
-//asians
+
 int main(void){
     volatile int * pixel_ctrl_ptr = (int *)PIXEL_BUF_CTRL_BASE;
     pixel_buffer_init(pixel_ctrl_ptr);
 
     while(1){
-        if(state == START) start(pixel_ctrl_ptr);
-        while(state == FREEPLAY) freeplay(pixel_ctrl_ptr);
-        if(state == END) end(pixel_ctrl_ptr);
-        if (state != START && state != FREEPLAY && state != END) printf("error: invalid state\n");
+        if(state == START) 
+            start(pixel_ctrl_ptr);
+            
+        while(state == FREEPLAY)
+            freeplay(pixel_ctrl_ptr);
+            
+        if(state == END) 
+            end(pixel_ctrl_ptr);
     }
-    
     return 1;
 }
 
@@ -36,19 +41,25 @@ void pixel_buffer_init(volatile int *pixel_ctrl_ptr){
 }
 
 void wait_for_vsync(){
+    
     volatile int * pixel_ctrl_ptr = (int *)PIXEL_BUF_CTRL_BASE;
     * pixel_ctrl_ptr = 1;
     while(*(pixel_ctrl_ptr + 3)&1);
+    
     return;
 }
 
 bool check_key_press(){
+    
     volatile int * keyboard_ptr = (int *) PS2_BASE; 
 	int keyboard_data, RVALID;
     keyboard_data = * keyboard_ptr;
 	RVALID = keyboard_data & 0x8000;
-    if(RVALID) return true;
-    else return false;
+	
+    if(RVALID) 
+        return true;
+        
+    return false;
 }
 
 /*
@@ -63,7 +74,8 @@ void start(volatile int *pixel_ctrl_ptr){
     }
     
     // wait to go to next screen
-    while(!check_key_press()) {;}
+    while(!check_key_press()) 
+        {;}
 
     // draw freeplay template on both buffers
     for(int i = 0; i < 2; i++){
@@ -71,45 +83,59 @@ void start(volatile int *pixel_ctrl_ptr){
         wait_for_vsync(); 
         pixel_buffer_start = *(pixel_ctrl_ptr + 1); 
     }
-    //initialise
+    
     initialise();
-
-    //buffer for 4s
-    for(int i = 0; i < 60*4; i++){
-        wait_for_vsync();
-    }
-
+    
     state = FREEPLAY;
     return;
 }
 
 void initialise(){
-    launch_angle = rand() % 361;
+
+	srand(time(0));
+
+    launch_angle = rand() % 360;
+	launch_angle *= DEGREES_TO_RADS;
     score = 0;
     high_score = 0;
+
+    prev_ball_location[0] = LAUNCH_X;
+    prev_ball_location[1] = LAUNCH_Y;
+
+    update_flipper_end_location(DEFAULT_FLIPPER_ANGLE);
+	prev_flipper_end_location[0][0] = flipper_end_location[0][0]; 
+    prev_flipper_end_location[0][1] = flipper_end_location[0][1];
+	prev_flipper_end_location[1][0] = flipper_end_location[1][0]; 
+    prev_flipper_end_location[1][1] = flipper_end_location[1][1];
+
     ball_velocity[0] = LAUNCH_SPEED * cos(launch_angle);
     ball_velocity[1] = LAUNCH_SPEED * sin(launch_angle);
+
     return;
 }
 
 void freeplay(volatile int *pixel_ctrl_ptr){
+
     collision_type = check_collision(ball_location[0], ball_location[1]);
     erase();
     update_prev();
     update();
     draw(pixel_ctrl_ptr);
     
-    if(lose) state = END;   
+    if(lose) 
+        state = END;   
 }
 
 void end(volatile int *pixel_ctrl_ptr){
+    
     for(int i = 0; i < 2; i++){
         draw_end_template();
         wait_for_vsync(); 
         pixel_buffer_start = *(pixel_ctrl_ptr + 1);
     }
 
-    while(!check_key_press()) {;}
+    while(!check_key_press()) 
+        {;}
 
     state = START;
     return;
@@ -148,7 +174,6 @@ void animate_flippers(){
     flipper_angle_counter -= 1;
 }
 
-
 void update_flipper_end_location(double angle){
     
     //update current
@@ -161,38 +186,149 @@ void update_flipper_end_location(double angle){
     int yright = FLIPPER_R_Y + FLIPPER_LENGTH * sin(angle);
     flipper_end_location[1][0] = xright;
     flipper_end_location[1][1] = yright;
+    
 }
 
 void update_ball_position(){
-    ball_location[0] += round (ball_velocity[0] / 60);
-    ball_location[1] += round (ball_velocity[1] / 60);
-    return;
+    
+    ball_position[0] += ball_velocity[0] / 60;
+    ball_position[1] += ball_velocity[1] / 60;
+
+    ball_location[0] = round(ball_position[0]);
+    ball_location[1] = round(ball_position[1]);
+    
 }
 
 void update_ball_velocity(){
+    
+    double v_angle, v_mag, f_angle;
+    int x, y;
 
     switch(collision_type){
+
         case 0: // if no collision
-            ball_velocity[0] += ball_acceleration[0] / 60;
             ball_velocity[1] += ball_acceleration[1] / 60;
             break;
-        case WALL_COLLIDE:
-        // if vertical wall, multiply x component by negative one
-        // if horizontal wall, multiply y component by negative one
+
+        case ROOF_COLLIDE:
+			if(ball_velocity[1]<0)
+				ball_velocity[1] = -ball_velocity[1];
+			ball_velocity[1] += ball_acceleration[1] / 60;
+			break;
+
+		case VARTICAL_WALL_COLLIDE:
+			//checking top left wall
+			if(ball_location[0]<=vertical_walls[2][0])
+				if(ball_velocity[0]<0)
+					ball_velocity[0] = -ball_velocity[0];
+			//checking bottom left wall
+			if(ball_location[0]<=vertical_walls[0][0])
+				if(ball_velocity[0]<0)
+					ball_velocity[0] = -ball_velocity[0];
+			//checking bottom right wall
+			if(ball_location[0]>=vertical_walls[1][0])
+				if(ball_velocity[0]>0)
+					ball_velocity[0] = -ball_velocity[0];
+			//checking top right wall
+			if(ball_location[0]>=vertical_walls[3][0])
+				if(ball_velocity[0]>0)
+					ball_velocity[0] = -ball_velocity[0];
+			break;
+			
+        case BUMPER_1_COLLIDE: // top left bumper, goes left to right, top to bottom
+        
+            x = bumper_centres[0][0];
+            y = bumper_centres[0][1]; 
+            f_angle = atan2((ball_location[1] - y), (ball_location[0] - x));
+			
+            v_mag = 2*(ball_velocity[0]*cos(f_angle) + ball_velocity[1]*sin(f_angle));
+            
+            ball_velocity[0] = ball_velocity[0] - v_mag*cos(f_angle); 
+            ball_velocity[1] = ball_velocity[1] - v_mag*sin(f_angle);
+            
             break;
-        case FLIPPER_COLLIDE: 
-        // ? how poop
-            break; 
-        default: // default case is for bumpers
-        // once again, if top or bottom of bumper, flip y 
-        // if left of right, flip x
-            ball_velocity[0] = ball_velocity[0];
+            
+        case BUMPER_2_COLLIDE:
+        
+            x = bumper_centres[1][0];
+            y = bumper_centres[1][1]; 
+            f_angle = atan2((ball_location[1] - y), (ball_location[0] - x));
+
+            v_mag = 2*(ball_velocity[0]*cos(f_angle) + ball_velocity[1]*sin(f_angle));
+            
+            ball_velocity[0] = ball_velocity[0] - v_mag*cos(f_angle); 
+            ball_velocity[1] = ball_velocity[1] - v_mag*sin(f_angle); 
+            
+            break;
+            
+        case BUMPER_3_COLLIDE:
+        
+            x = bumper_centres[2][0];
+            y = bumper_centres[2][1]; 
+            f_angle = atan2((ball_location[1] - y), (ball_location[0] - x));
+
+            v_mag = 2*(ball_velocity[0]*cos(f_angle) + ball_velocity[1]*sin(f_angle));
+            
+            ball_velocity[0] = ball_velocity[0] - v_mag*cos(f_angle); 
+            ball_velocity[1] = ball_velocity[1] - v_mag*sin(f_angle);
+            
+            break;
+            
+        case BUMPER_4_COLLIDE:
+        
+            x = bumper_centres[3][0];
+            y = bumper_centres[3][1]; 
+            f_angle = atan2((ball_location[1] - y), (ball_location[0] - x));
+
+            v_mag = 2*(ball_velocity[0]*cos(f_angle) + ball_velocity[1]*sin(f_angle));
+            
+            ball_velocity[0] = ball_velocity[0] - v_mag*cos(f_angle); 
+            ball_velocity[1] = ball_velocity[1] - v_mag*sin(f_angle); 
+            
+            break;
+            
+        case BUMPER_5_COLLIDE:
+        
+            x = bumper_centres[4][0];
+            y = bumper_centres[4][1]; 
+            f_angle = atan2((ball_location[1] - y), (ball_location[0] - x));
+
+            v_mag = 2*(ball_velocity[0]*cos(f_angle) + ball_velocity[1]*sin(f_angle));
+            
+            ball_velocity[0] = ball_velocity[0] - v_mag*cos(f_angle); 
+            ball_velocity[1] = ball_velocity[1] - v_mag*sin(f_angle); 
+            
+            break;
+            
+        case FLIPPER_COLLIDE:
+        
+            if(flipper_angle_counter == -1)
+                f_angle = 180*DEGREES_TO_RADS - DEFAULT_FLIPPER_ANGLE;
+            else
+                f_angle = flipper_angles[NUM_FLIPPER_ANGLES+flipper_angle_counter];
+
+            v_mag = 2*(ball_velocity[0]*cos(f_angle) + ball_velocity[1]*sin(f_angle));
+            ball_velocity[0] = ball_velocity[0] - v_mag*cos(f_angle); 
+            ball_velocity[1] = - (ball_velocity[1] - v_mag*sin(f_angle)); 
+            
+            break;
+            
+        default:
+        
+            f_angle = 180*DEGREES_TO_RADS - slanted_angles[collision_type-1];
+            v_mag = 2*(ball_velocity[0]*cos(f_angle) + ball_velocity[1]*sin(f_angle));
+            
+            ball_velocity[0] = ball_velocity[0] - v_mag*cos(f_angle); 
+            ball_velocity[1] = -(ball_velocity[1] - v_mag*sin(f_angle)); 
+            
             break;
     }
+
     return;
 }
 
 void update_score(){
+
 
 
     return;
@@ -209,7 +345,7 @@ void draw(volatile int *pixel_ctrl_ptr){
     draw_flippers();
     draw_ball(ball_location[0], ball_location[1]);
     draw_score();
-
+	
     wait_for_vsync(); // swap front and back buffers on VGA vertical sync
     pixel_buffer_start = *(pixel_ctrl_ptr + 1); // new back buffer
 }
@@ -228,7 +364,7 @@ void draw_ball(int x, int y){
         if(j==-4 || j == 4) limit =4;
         if(j==-3 || j == 3) limit =5;
         for(int i = -limit; i <= limit; i++){
-            if(j<320 && i<240) plot_pixel(x+i, y+j, ball_colours[y+j][x+i]);
+            if(j<320 && i<240) plot_pixel(x+i, y+j, ball_colours[j+6][i+6]);
         }
     }
 }
@@ -364,10 +500,10 @@ void draw_thick_line(int x0, int y0, int x1, int y1, short int colour){
 
     for(int x = x0; x <= x1; x++){
         if(is_steep){
-			plot_pixel(y,x,colour);
+			draw_box(y,x,colour);
 		}
         else {
-			plot_pixel(x,y,colour);
+			draw_box(x,y,colour);
 		}
         error += dy;
         if(error > 0){
@@ -403,10 +539,12 @@ int check_collision(int ball_x, int ball_y){
     //check in the following order for optimal speed:
     
     //check straight walls
-    if(ball_y<= roof) return WALL_COLLIDE;
+    if(ball_y<= roof) return ROOF_COLLIDE;
+	
     for(int i = 0; i<NUM_VERTICAL_WALLS; i++){
-        if(ball_x== vertical_walls[i][0]){
-            if(ball_y > vertical_walls[i][1] && ball_y < vertical_walls[i][2]) return WALL_COLLIDE;
+        if(ball_x <= vertical_walls[i][0]+3 && ball_x >= vertical_walls[i][0]-3){
+            if(ball_y > vertical_walls[i][1] && ball_y < vertical_walls[i][2]) 
+				return VARTICAL_WALL_COLLIDE;
         }
     }
 
@@ -414,14 +552,53 @@ int check_collision(int ball_x, int ball_y){
     if(check_flipper_collide(0, ball_x,ball_y)) return FLIPPER_COLLIDE; //left
     if(check_flipper_collide(1, ball_x,ball_y)) return FLIPPER_COLLIDE; //right
 
+		
+	for(int i = 0; i < 5; i++){
+    	if(check_bumper_collide(i, ball_x,ball_y)) 
+			return (-i-1);
+	}
     //check slanted walls
     for(int i = 0; i<NUM_SLANTED_WALLS; i++){
-        if(check_slanted_wall_collide(i,ball_x,ball_y)) return WALL_COLLIDE;
+        if(check_slanted_wall_collide(i,ball_x,ball_y)){
+			switch(i){
+				case 0:
+					return WALL_0_COLLIDE;
+					break;
+				case 1: 
+					return WALL_1_COLLIDE;
+					break;
+				case 2:  
+					return WALL_2_COLLIDE;
+					break;
+				case 3:  
+					return WALL_3_COLLIDE;
+					break;
+				case 4:  
+					return WALL_4_COLLIDE;
+					break;
+				case 5:  
+					return WALL_5_COLLIDE;
+					break;
+				default:
+					break;
+			}
+		}
     }
 
-    //check bumpers
-
     return collision_type;
+}
+
+bool check_bumper_collide(int bumper_id, int ball_x, int ball_y){
+    
+    int x = bumper_centres[bumper_id][0];
+    int y = bumper_centres[bumper_id][1];
+    
+    double radius = sqrt(pow((x - ball_x),2) + pow((y - ball_y), 2));
+
+    if(radius <= (BUMPER_DIAMETER + BALL_DIAMETER + 4) /2) 
+        return true;
+    
+    return false;
 }
 
 //tested
@@ -451,10 +628,14 @@ bool check_slanted_wall_collide(int wall_id, int ball_x, int ball_y){
 
     for(int x = x0; x <= x1; x++){
         if(is_steep){
-            if(ball_x == y && ball_y == x) return true;
+            //if(ball_x == y && ball_y == x) return true;
+			double a = sqrt(pow((ball_x - y),2) + pow((ball_y - x),2));
+			if(a <=  2) {return true;}
 		}
         else {
-            if(ball_x == x && ball_y == y) return true;
+            //if(ball_x == x && ball_y == y) return true;
+			double a = sqrt(pow((ball_x - x),2) + pow((ball_y - y),2));
+			if(a <=  2) {return true;}
 		}
         error += dy;
         if(error > 0){
