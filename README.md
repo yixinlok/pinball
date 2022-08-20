@@ -1,5 +1,9 @@
 # Pinball
-Pinball game using C meant to be directly displayed on a VGA monitor of a ARM DE1-SoC computer. Press any key to start and the ball will directly spawn from the spawn point at the top of the screen in a random direction. 
+This is a pinball game using C meant to be directly displayed on a VGA monitor of a ARM DE1-SoC computer. 
 
-<img width="559" alt="Screenshot 2022-08-17 at 2 51 09 AM" src="https://user-images.githubusercontent.com/81039266/184973420-36d5e1ad-e3a6-491f-95b0-ce53ac67bfec.png">
-<img width="559" alt="Screenshot 2022-08-17 at 2 57 38 AM" src="https://user-images.githubusercontent.com/81039266/184973425-6684fea1-e657-4bd2-9761-023828249986.png">
+Press the space bar to start and the ball will directly spawn from the spawn point at the top of the screen in a random direction. The flippers are also controlled using the space bar.
+
+Here is a demonstration on CPULator, an online ARM DE1-SoC simulator. However, note that because we are using CPULator the performance is a lot slower than on an actual DE1-SoC computer.
+
+
+![pinball-demo](https://user-images.githubusercontent.com/81039266/185738616-1e3f67b6-efba-444d-97c4-1e70b036b799.gif)
