@@ -1,5 +1,5 @@
 # Pinball
-This is a pinball game using C meant to be directly displayed on a VGA monitor of a ARM DE1-SoC computer. 
+This is a pinball game using C meant to be directly run on a ARM DE1-SoC computer. 
 
 Press the space bar to start and the ball will directly spawn from the spawn point at the top of the screen in a random direction. The flippers are also controlled using the space bar.
 
